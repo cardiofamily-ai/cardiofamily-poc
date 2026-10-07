@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react'
 import { Outlet, useLocation } from 'react-router'
 import { SafetyBanner } from '@/components/SafetyBanner'
+import { SmallScreenNotice } from '@/components/SmallScreenNotice'
 import { SideNav } from './SideNav'
 
 export function AppShell() {
@@ -17,6 +18,7 @@ export function AppShell() {
   return (
     <div className="flex h-dvh min-w-[1024px] flex-col overflow-clip bg-background">
       <SafetyBanner />
+      <SmallScreenNotice />
       <div className="flex min-h-0 flex-1">
         <SideNav />
         <main ref={mainRef} id="main" className="relative min-w-0 flex-1 overflow-y-auto">

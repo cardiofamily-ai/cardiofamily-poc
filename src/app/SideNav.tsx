@@ -1,6 +1,7 @@
 import { HeartPulse, RotateCcw } from 'lucide-react'
 import { useState } from 'react'
 import { NavLink } from 'react-router'
+import { PROTOTYPE_NAME_NOTICE } from '@/domain/safety'
 import { formatDisplayDate } from '@/lib/format'
 import { cn } from '@/lib/utils'
 import { useClock } from '@/state/clock-context'
@@ -59,6 +60,7 @@ export function SideNav() {
           <dd className="font-medium">Synthetic · fictional families</dd>
         </div>
       </dl>
+      <p className="px-5 pb-4 text-[10px] leading-snug text-muted-foreground">{PROTOTYPE_NAME_NOTICE}</p>
     </aside>
   )
 }

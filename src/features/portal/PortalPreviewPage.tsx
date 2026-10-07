@@ -2,6 +2,8 @@ import { ArrowLeft, CalendarDays, Dna, HeartPulse, Info, MessageCircle, ShieldAl
 import type { ReactNode } from 'react'
 import { Link } from 'react-router'
 import { SafetyBanner } from '@/components/SafetyBanner'
+import { SmallScreenNotice } from '@/components/SmallScreenNotice'
+import { PROTOTYPE_NAME_NOTICE } from '@/domain/safety'
 import { formatDisplayDate } from '@/lib/format'
 import { useClock } from '@/state/clock-context'
 import { primaryAction } from '@/state/display-priority'
@@ -36,8 +38,9 @@ export function PortalPreviewPage() {
   const test = profile.genotype.test
 
   return (
-    <div className="flex min-h-dvh flex-col bg-muted/40">
+    <div className="flex min-h-dvh min-w-[1024px] flex-col bg-muted/40">
       <SafetyBanner />
+      <SmallScreenNotice />
       <header className="flex items-center justify-between border-b bg-background px-8 py-3">
         <div>
           <p className="text-sm font-semibold">Relative Portal preview</p>
@@ -66,6 +69,7 @@ export function PortalPreviewPage() {
             <li>• Gives no medical advice; the care team decides what is appropriate.</li>
             <li>• Not built: sign-in, consent, messaging, booking or uploads.</li>
           </ul>
+          <p className="text-xs text-muted-foreground">{PROTOTYPE_NAME_NOTICE}</p>
           <p>
             <Link to={profilePath(PREVIEW.familyId, PREVIEW.personId)} className="text-primary hover:underline">
               Compare with the clinician’s view of {person.givenName}

@@ -2,6 +2,9 @@
 
 **Synthetic Data · Demonstration Environment · Not for Clinical Use**
 
+*CardioFamily is a working prototype name. All people, institutions, variants
+and clinical records shown in this demonstration are fictional and synthetic.*
+
 CardioFamily is a clinician-facing cardiogenetics family-care concept. This
 proof of concept demonstrates, for hypertrophic cardiomyopathy (HCM) only,
 how one genetic diagnosis can trigger structured, explainable follow-up for an
@@ -23,7 +26,7 @@ Clinician decisions only record CardioFamily workflow state.
 
 ## Running locally
 
-Requires Node 24+.
+Requires Node 24 (`engines.node` is `24.x`).
 
 ```bash
 npm install
@@ -82,6 +85,39 @@ See [`docs/DEMO-GUIDE.md`](docs/DEMO-GUIDE.md) for a presenter walkthrough.
   pathogenic → five relatives potentially affected, each with reasons →
   clinician records *Reviewed* → family workflow re-evaluated, nothing changed
   automatically.
+
+## Deploying to Vercel
+
+The app is a static single-page application. No backend, database, secrets or
+environment variables are needed, and no analytics or telemetry are included.
+
+1. Push the repository to GitHub and import it in Vercel (**Add New → Project**);
+   every push to the production branch then deploys automatically, and pull
+   requests get preview deployments.
+2. Project settings (Vercel auto-detects these for Vite):
+
+   | Setting | Value |
+   |---|---|
+   | Framework preset | Vite |
+   | Install command | `npm install` (default) |
+   | Build command | `npm run build` (runs `tsc -b && vite build`) |
+   | Output directory | `dist` |
+   | Node.js version | 24.x (from `engines.node`) |
+   | Environment variables | none |
+
+3. SPA routing: [`vercel.json`](vercel.json) rewrites every path to
+   `/index.html`, so deep links such as `/families/fam-janssens` or
+   `/reclassifications/rc-peeters-1` work when opened or refreshed directly.
+   Vercel serves existing static files (JS, CSS, fonts) before applying the
+   rewrite.
+
+   ```json
+   { "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }] }
+   ```
+
+Demo decisions are held in browser memory only, so each visitor starts from the
+seeded state and nothing is stored server-side. Below 1024px a small notice
+recommends a desktop screen; the app is not blocked.
 
 ## Architecture
 

@@ -1,6 +1,6 @@
 import { screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { ENVIRONMENT_NOTICE } from '@/domain/safety'
+import { ENVIRONMENT_NOTICE, PROTOTYPE_NAME_NOTICE, SMALL_SCREEN_NOTICE } from '@/domain/safety'
 import { renderApp } from '@/test/render-app'
 import { NAV_ITEMS } from './navigation'
 
@@ -17,6 +17,12 @@ describe('application shell', () => {
     renderApp(path)
     const notice = await screen.findByRole('note', { name: 'Environment notice' })
     expect(notice).toHaveTextContent(ENVIRONMENT_NOTICE)
+  })
+
+  it('includes the small-screen notice (CSS hides it at 1024px and above) and the working-name statement', async () => {
+    renderApp('/')
+    expect(await screen.findByRole('note', { name: 'Screen size notice' })).toHaveTextContent(SMALL_SCREEN_NOTICE)
+    expect(screen.getByText(PROTOTYPE_NAME_NOTICE)).toBeInTheDocument()
   })
 
   it('shows the frozen demo date', async () => {
