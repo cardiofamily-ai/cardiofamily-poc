@@ -30,7 +30,7 @@ describe('categoriseRelative', () => {
     ['proband', 'genotype-positive-phenotype-positive'],
     ['child2', 'genotype-positive-no-phenotype'],
     ['grandpa', 'at-risk-not-tested'],
-    ['grandma', 'at-risk-not-tested'], // declined
+    ['grandma', 'at-risk-testing-declined'],
     ['child', 'at-risk-result-pending'],
     ['sibling', 'familial-variant-not-detected'],
     ['partner', 'not-blood-relative'],

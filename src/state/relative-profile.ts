@@ -7,6 +7,7 @@ import type { ImpactReason } from '@/domain/reclassification/impact'
 import type { RelativeStatus } from '@/domain/relative-status'
 import type { SurveillancePlan } from '@/domain/surveillance/types'
 import type { FamilyOverview, PendingReclassification } from './caseload'
+import { primaryAction } from './display-priority'
 
 export interface RelativeProfile {
   readonly family: FamilyOverview
@@ -14,7 +15,7 @@ export interface RelativeProfile {
   readonly status: RelativeStatus
   /** Open actions for this person, in engine priority order. */
   readonly actions: readonly FamilyAction[]
-  /** The most urgent open action, if any. */
+  /** The action shown first as NEXT ACTION (display priority, see primaryAction). */
   readonly nextAction: FamilyAction | undefined
   readonly genotype: GenotypeSummary
   /** Newest first. */
@@ -38,7 +39,7 @@ export function buildRelativeProfile(family: FamilyOverview, personId: string): 
     summary,
     status: family.relativeStatuses[personId]!,
     actions,
-    nextAction: actions[0],
+    nextAction: primaryAction(actions),
     genotype: summary.genotypes.find((g) => g.variantId === family.variant.id) ?? { status: 'untested' },
     tests: snapshot.geneticTests
       .filter((t) => t.personId === personId)

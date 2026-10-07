@@ -17,6 +17,7 @@ export type RelativeStatusCategory =
   | 'genotype-positive-no-phenotype'
   | 'at-risk-not-tested'
   | 'at-risk-result-pending'
+  | 'at-risk-testing-declined'
   | 'familial-variant-not-detected'
   | 'vus-detected'
   | 'not-blood-relative'
@@ -82,8 +83,8 @@ export function categoriseRelative(
       basis.push(`Genetic test for the familial variant requested ${test!.requestedDate}; result pending.`)
       return { category: 'at-risk-result-pending', basis }
     case 'declined':
-      basis.push('Genetic testing for the familial variant declined.')
-      return { category: 'at-risk-not-tested', basis }
+      basis.push(`Genetic testing for the familial variant recorded as declined (${test!.requestedDate}).`)
+      return { category: 'at-risk-testing-declined', basis }
     case 'untested':
       basis.push('No genetic test for the familial variant recorded.')
       return { category: 'at-risk-not-tested', basis }

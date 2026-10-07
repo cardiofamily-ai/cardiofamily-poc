@@ -7,6 +7,7 @@ import type { IsoDate } from '@/domain/time'
 import { formatDisplayDate } from '@/lib/format'
 import { cn } from '@/lib/utils'
 import type { FamilyOverview } from '@/state/caseload'
+import { primaryAction } from '@/state/display-priority'
 import { ageText, fullName, relationshipText } from '../shared/person-text'
 
 /** Every recorded person, those needing attention first. */
@@ -100,7 +101,7 @@ export function RelativesTable({
                     <div className="max-w-64">
                       <div className={cn('flex items-start gap-1.5', overdue > 0 && 'text-overdue')}>
                         {overdue > 0 && <AlertTriangle aria-label="Overdue" className="mt-0.5 size-3.5 shrink-0" />}
-                        <span className="line-clamp-2">{actions[0]!.what}</span>
+                        <span className="line-clamp-2">{primaryAction(actions)!.what}</span>
                       </div>
                       {actions.length > 1 && (
                         <div className="text-xs text-muted-foreground">+{actions.length - 1} more</div>

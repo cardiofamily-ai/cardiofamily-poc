@@ -25,6 +25,8 @@ describe('relative profile read model', () => {
     ['fam-janssens', 'p-janssens-sarah', undefined],
     ['fam-peeters', 'p-peeters-bram', 'DEMO-R-003'],
     ['fam-peeters', 'p-peeters-maria', 'DEMO-R-006'],
+    // Reclassification review shown ahead of the routine VUS review (display priority only)
+    ['fam-peeters', 'p-peeters-koen', 'DEMO-R-006'],
   ])('%s %s: next action %s', (f, p, rule) => {
     expect(profile(f, p).nextAction?.ruleId).toBe(rule)
   })
@@ -43,5 +45,14 @@ describe('relative profile read model', () => {
     ])
     expect(profile('fam-peeters', 'p-peeters-sofie').pendingImpacts).toEqual([])
     expect(profile('fam-janssens', 'p-janssens-pieter').pendingImpacts).toEqual([])
+  })
+})
+
+describe('primaryAction (display priority)', () => {
+  it('keeps dated items first', () => {
+    expect(profile('fam-peeters', 'p-peeters-bram').nextAction?.ruleId).toBe('DEMO-R-003')
+  })
+  it('does not reorder the engine output', () => {
+    expect(profile('fam-peeters', 'p-peeters-koen').actions.map((a) => a.ruleId)).toEqual(['DEMO-R-005', 'DEMO-R-006'])
   })
 })

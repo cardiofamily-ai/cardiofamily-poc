@@ -75,6 +75,7 @@ export const RELATIVE_STATUS_TEXT: Record<RelativeStatusCategory, string> = {
   'genotype-positive-no-phenotype': 'Genotype-positive / no phenotype recorded',
   'at-risk-not-tested': 'At-risk relative / not yet tested',
   'at-risk-result-pending': 'At-risk relative / result pending',
+  'at-risk-testing-declined': 'At-risk relative / testing declined',
   'familial-variant-not-detected': 'Familial variant not detected',
   'vus-detected': 'Variant of uncertain significance detected',
   'not-blood-relative': 'Not a blood relative',
