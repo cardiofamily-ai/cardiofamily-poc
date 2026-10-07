@@ -16,7 +16,10 @@
     "check": "npm run typecheck && npm run lint && npm run test && npm run build",
     "preview": "vite preview",
     "test:e2e": "playwright test",
-    "verify": "npm run check && npm run test:e2e"
+    "verify": "npm run check && npm run check:streamlit && npm run test:e2e",
+    "build:streamlit": "tsc -b && vite build --mode streamlit",
+    "check:streamlit": "node build-tools/check-streamlit-artifact.mjs",
+    "test:streamlit": "playwright test --config playwright.streamlit.config.ts"
   },
   "dependencies": {
     "@fontsource-variable/geist": "^5.3.0",

@@ -46,7 +46,7 @@ describe('Relative Profile', () => {
     open('fam-janssens', 'p-janssens-mila')
     const actions = await screen.findByRole('region', { name: /Outstanding actions/ })
     const links = within(actions).getAllByRole('link', { name: 'View record' })
-    expect(links[0]).toHaveAttribute('href', '#record-gt-janssens-mila')
+    expect(links[0]).toHaveAttribute('href', '/families/fam-janssens/people/p-janssens-mila#record-gt-janssens-mila')
     expect(document.getElementById('record-gt-janssens-mila')).not.toBeNull()
   })
 

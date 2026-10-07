@@ -1,0 +1,16 @@
+# Streamlit settings for hosting the CardioFamily POC.
+
+[browser]
+# Do not send Streamlit usage statistics.
+gatherUsageStats = false
+
+[client]
+# Keep Streamlit chrome out of the way; CardioFamily is the visible product.
+toolbarMode = "minimal"
+showSidebarNavigation = false
+
+[server]
+headless = true
+
+[theme]
+base = "light"

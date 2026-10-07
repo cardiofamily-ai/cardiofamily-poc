@@ -1,0 +1,2 @@
+# Only dependency needed to host the prebuilt CardioFamily React bundle.
+streamlit==1.64.0

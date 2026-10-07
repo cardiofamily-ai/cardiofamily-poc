@@ -88,9 +88,9 @@ function NextActionPanel({ profile, today }: { profile: RelativeProfile; today: 
         {DEMO_RULES[action.ruleId].title}
       </p>
       {more > 0 && (
-        <a href="#open-actions" className="mt-2 self-start text-xs text-primary hover:underline">
-          +{more} more open {more === 1 ? 'action' : 'actions'}
-        </a>
+        <Link to="#open-actions" className="mt-2 self-start text-xs text-primary hover:underline">
+          +{more} more outstanding {more === 1 ? 'action' : 'actions'}
+        </Link>
       )}
       <SafetyNote className="mt-auto pt-3" />
     </Panel>
