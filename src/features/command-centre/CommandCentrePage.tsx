@@ -178,7 +178,7 @@ function AttentionRow({ item, today }: { item: AttentionItem; today: IsoDate }) 
   const { action, person, family } = item
   return (
     <li>
-      <Link to={`/families/${family.snapshot.family.id}?person=${person.person.id}`} className={ROW}>
+      <Link to={`/families/${family.snapshot.family.id}/people/${person.person.id}`} className={ROW}>
         <DueLabel when={action.when} today={today} className="text-sm" />
         <div className="min-w-0">
           <div className="truncate text-sm font-medium">{fullName(person.person)}</div>
@@ -246,7 +246,7 @@ function UpcomingSurveillance({ caseload }: { caseload: Caseload }) {
         {items.map(({ family, person, dueDate }) => (
           <li key={person.person.id}>
             <Link
-              to={`/families/${family.snapshot.family.id}?person=${person.person.id}`}
+              to={`/families/${family.snapshot.family.id}/people/${person.person.id}`}
               className="flex items-baseline justify-between gap-3 py-2 text-sm hover:text-primary"
             >
               <span className="min-w-0">

@@ -2,6 +2,7 @@
 import type { GenotypeStatus, GenotypeSummary } from '@/domain/genetics/genotype'
 import type { Classification } from '@/domain/genetics/types'
 import type { PhenotypeStatus } from '@/domain/phenotype/phenotype'
+import type { RelativeStatusCategory } from '@/domain/relative-status'
 import type { SurveillanceState } from '@/domain/surveillance/surveillance'
 import { formatDisplayDate } from '@/lib/format'
 
@@ -66,4 +67,16 @@ export function testingText(genotype: GenotypeSummary): string {
         : `${kind} · ${status}`
     }
   }
+}
+
+/** RISK labels: descriptive status only. Wording agreed for the demonstration. */
+export const RELATIVE_STATUS_TEXT: Record<RelativeStatusCategory, string> = {
+  'genotype-positive-phenotype-positive': 'Genotype-positive / phenotype-positive',
+  'genotype-positive-no-phenotype': 'Genotype-positive / no phenotype recorded',
+  'at-risk-not-tested': 'At-risk relative / not yet tested',
+  'at-risk-result-pending': 'At-risk relative / result pending',
+  'familial-variant-not-detected': 'Familial variant not detected',
+  'vus-detected': 'Variant of uncertain significance detected',
+  'not-blood-relative': 'Not a blood relative',
+  'not-categorised': 'Not categorised',
 }

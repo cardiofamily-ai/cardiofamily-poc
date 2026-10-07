@@ -1,4 +1,5 @@
-import { AlertTriangle } from 'lucide-react'
+import { AlertTriangle, ChevronRight } from 'lucide-react'
+import { Link } from 'react-router'
 import { testingText } from '@/components/clinical/labels'
 import { GenotypeLabel, NotBloodRelativeLabel, PhenotypeLabel, SurveillanceLabel } from '@/components/clinical/StatusLabels'
 import { isBloodRelative } from '@/domain/family/kinship'
@@ -40,6 +41,7 @@ export function RelativesTable({
             <th scope="col" className="px-4 py-2.5 font-medium">Phenotype</th>
             <th scope="col" className="px-4 py-2.5 font-medium">Surveillance</th>
             <th scope="col" className="px-4 py-2.5 font-medium">Open actions</th>
+            <th scope="col" className="w-12"><span className="sr-only">Profile</span></th>
           </tr>
         </thead>
         <tbody className="divide-y">
@@ -105,6 +107,16 @@ export function RelativesTable({
                       )}
                     </div>
                   )}
+                </td>
+                <td className="pr-3 py-3">
+                  <Link
+                    to={`/families/${family.snapshot.family.id}/people/${person.id}`}
+                    onClick={(e) => e.stopPropagation()}
+                    aria-label={`Open relative profile for ${fullName(person)}`}
+                    className="inline-flex rounded-md p-1 text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+                  >
+                    <ChevronRight aria-hidden className="size-4" />
+                  </Link>
                 </td>
               </tr>
             )

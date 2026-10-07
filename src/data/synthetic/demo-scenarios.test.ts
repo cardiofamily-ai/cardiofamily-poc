@@ -9,6 +9,7 @@ import { summarisePerson } from '@/domain/person-summary'
 import { assessReclassificationImpact } from '@/domain/reclassification/impact'
 import type { FamilySnapshot } from '@/domain/snapshot'
 import { ageOn } from '@/domain/time'
+import { buildFamilyOverview } from '@/state/caseload'
 import { SYNTHETIC_FAMILIES } from '.'
 import { duboisFamily, maesFamily, woutersFamily } from './dashboard-families'
 import { janssensFamily } from './janssens'
@@ -191,5 +192,41 @@ describe('whole dataset', () => {
         }
       }
     }
+  })
+})
+
+describe('RISK categorisation (descriptive, demonstration only)', () => {
+  const categories = (s: FamilySnapshot, acknowledged: string[] = []) =>
+    buildFamilyOverview(s, { today, acknowledgedReclassificationIds: acknowledged })
+
+  it('Janssens', () => {
+    const { relativeStatuses } = categories(janssensFamily)
+    expect(Object.fromEntries(Object.entries(relativeStatuses).map(([id, s]) => [id.replace('p-janssens-', ''), s.category]))).toEqual({
+      marc: 'genotype-positive-phenotype-positive',
+      annick: 'familial-variant-not-detected',
+      pieter: 'genotype-positive-no-phenotype',
+      sarah: 'genotype-positive-phenotype-positive',
+      eline: 'at-risk-not-tested',
+      jonas: 'not-blood-relative',
+      lucas: 'genotype-positive-no-phenotype',
+      mila: 'at-risk-result-pending',
+    })
+  })
+
+  it('Peeters before and after the reclassification is acknowledged', () => {
+    const short = (r: Record<string, { category: string }>) =>
+      Object.fromEntries(Object.entries(r).map(([id, s]) => [id.replace('p-peeters-', ''), s.category]))
+    expect(short(categories(peetersFamily).relativeStatuses)).toEqual({
+      jozef: 'not-categorised',
+      maria: 'at-risk-not-tested',
+      hilde: 'at-risk-not-tested',
+      koen: 'vus-detected',
+      sofie: 'not-blood-relative',
+      bram: 'at-risk-not-tested',
+      lotte: 'at-risk-not-tested',
+    })
+    expect(short(categories(peetersFamily, ['rc-peeters-1']).relativeStatuses).koen).toBe(
+      'genotype-positive-phenotype-positive',
+    )
   })
 })

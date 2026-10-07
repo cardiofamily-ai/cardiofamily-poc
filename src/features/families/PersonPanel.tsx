@@ -1,7 +1,9 @@
-import { X } from 'lucide-react'
+import { ArrowRight, Info, X } from 'lucide-react'
+import { Link } from 'react-router'
 import type { ReactNode } from 'react'
 import { ActionDetail } from '@/components/clinical/ActionDetail'
-import { MODALITY_TEXT, testingText } from '@/components/clinical/labels'
+import { MODALITY_TEXT, RELATIVE_STATUS_TEXT, testingText } from '@/components/clinical/labels'
+import { DEMO_CATEGORISATION_NOTICE } from '@/domain/safety'
 import { GenotypeLabel, NotBloodRelativeLabel, PhenotypeLabel, SurveillanceLabel } from '@/components/clinical/StatusLabels'
 import { isBloodRelative } from '@/domain/family/kinship'
 import type { PersonSummary } from '@/domain/person-summary'
@@ -43,6 +45,13 @@ export function PersonPanel({
           <p className="text-xs text-muted-foreground">
             {relationshipText(summary)} · {sexText(person)} · {ageText(person, today)}
           </p>
+          <Link
+            to={`/families/${family.snapshot.family.id}/people/${person.id}`}
+            className="mt-1.5 inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline"
+          >
+            Open relative profile
+            <ArrowRight aria-hidden className="size-3" />
+          </Link>
         </div>
         <button
           type="button"
@@ -55,6 +64,13 @@ export function PersonPanel({
       </header>
 
       <dl className="divide-y px-4">
+        <Row label="Risk">
+          <span className="font-medium">{RELATIVE_STATUS_TEXT[family.relativeStatuses[person.id]!.category]}</span>
+          <div className="flex items-center gap-1 text-[11px] text-muted-foreground">
+            <Info aria-hidden className="size-3 shrink-0" />
+            {DEMO_CATEGORISATION_NOTICE}
+          </div>
+        </Row>
         <Row label="Genotype">
           {isBloodRelative(summary.relationshipToProband) ? (
             <>

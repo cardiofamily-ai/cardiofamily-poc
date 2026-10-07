@@ -4,11 +4,11 @@ import { SideNav } from './SideNav'
 
 export function AppShell() {
   return (
-    <div className="flex h-dvh min-w-[1024px] flex-col bg-background">
+    <div className="flex h-dvh min-w-[1024px] flex-col overflow-clip bg-background">
       <SafetyBanner />
       <div className="flex min-h-0 flex-1">
         <SideNav />
-        <main id="main" className="min-w-0 flex-1 overflow-y-auto">
+        <main id="main" className="relative min-w-0 flex-1 overflow-y-auto">
           <Outlet />
         </main>
       </div>

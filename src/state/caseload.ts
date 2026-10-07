@@ -6,10 +6,12 @@
 import { evaluateFamilyActions } from '@/domain/actions/engine'
 import type { FamilyAction } from '@/domain/actions/types'
 import type { Person } from '@/domain/family/types'
-import { currentInterpretation } from '@/domain/genetics/interpretation'
+import { currentInterpretation, interpretationHistory } from '@/domain/genetics/interpretation'
 import type { Variant, VariantInterpretation } from '@/domain/genetics/types'
 import { summarisePerson, type PersonSummary } from '@/domain/person-summary'
+import { categoriseRelative, type RelativeStatus } from '@/domain/relative-status'
 import {
+  applyReclassifications,
   assessReclassificationImpact,
   pendingReclassifications,
   type ReclassificationImpact,
@@ -33,9 +35,14 @@ export interface FamilyOverview {
   readonly snapshot: FamilySnapshot
   readonly proband: Person
   readonly variant: Variant
+  /** Current interpretation, including clinician-acknowledged reclassifications. */
   readonly interpretation: VariantInterpretation
+  /** All interpretations of the familial variant in force so far, oldest first. */
+  readonly interpretationHistory: readonly VariantInterpretation[]
   readonly actions: readonly FamilyAction[]
   readonly people: readonly PersonSummary[]
+  /** RISK categorisation per person id. */
+  readonly relativeStatuses: Readonly<Record<string, RelativeStatus>>
   readonly pendingReclassifications: readonly PendingReclassification[]
   /** Distinct people with at least one open action. */
   readonly peopleNeedingAttention: number
@@ -57,19 +64,30 @@ export function buildFamilyOverview(snapshot: FamilySnapshot, ctx: EvaluationCon
   const proband = getProband(snapshot)
   const diagnostic = snapshot.geneticTests.find((t) => t.personId === proband.id && t.kind === 'diagnostic')
   const variant = snapshot.variants.find((v) => v.id === diagnostic?.variantId) ?? snapshot.variants[0]
-  const interpretation = variant && currentInterpretation(snapshot.interpretations, variant.id, ctx.today)
+  const acknowledged = snapshot.reclassificationEvents.filter(
+    (e) => e.receivedDate <= ctx.today && ctx.acknowledgedReclassificationIds.includes(e.id),
+  )
+  const effective = applyReclassifications(snapshot, acknowledged)
+  const interpretation = variant && currentInterpretation(effective.interpretations, variant.id, ctx.today)
   if (!variant || !interpretation) {
     throw new Error(`${snapshot.family.id}: no familial variant with a current interpretation`)
   }
 
   const actions = evaluateFamilyActions(snapshot, ctx)
+  const people = snapshot.people.map((p) => summarisePerson(snapshot, p.id, ctx.today))
   return {
     snapshot,
     proband,
     variant,
     interpretation,
+    interpretationHistory: interpretationHistory(effective.interpretations, variant.id).filter(
+      (i) => i.effectiveDate <= ctx.today,
+    ),
     actions,
-    people: snapshot.people.map((p) => summarisePerson(snapshot, p.id, ctx.today)),
+    people,
+    relativeStatuses: Object.fromEntries(
+      people.map((p) => [p.person.id, categoriseRelative(p, variant.id, interpretation.classification)]),
+    ),
     pendingReclassifications: pendingReclassifications(
       snapshot,
       ctx.acknowledgedReclassificationIds,
