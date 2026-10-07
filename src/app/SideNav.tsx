@@ -31,7 +31,7 @@ export function SideNav() {
                 end={to === '/'}
                 className={({ isActive }) =>
                   cn(
-                    'flex items-center gap-2.5 rounded-md px-2.5 py-2 text-sm transition-colors',
+                    'flex items-center gap-2.5 rounded-md px-2.5 py-2 text-sm',
                     'focus-visible:ring-2 focus-visible:ring-sidebar-ring focus-visible:outline-none',
                     isActive
                       ? 'bg-sidebar-accent font-medium text-sidebar-accent-foreground'
@@ -63,16 +63,17 @@ export function SideNav() {
   )
 }
 
-/** Clears in-memory review decisions, restoring the seeded demonstration. */
+/** Clears in-memory review and workflow decisions, restoring the seeded demonstration. */
 function ResetDemo() {
-  const { reviews, resetDemo } = useDemoSession()
+  const { reviews, actionLog, resetDemo } = useDemoSession()
   const [confirming, setConfirming] = useState(false)
-  if (reviews.length === 0) return null
+  const recorded = reviews.length + actionLog.length
+  if (recorded === 0) return null
 
   return (
     <div className="border-t border-sidebar-border px-5 py-3 text-xs">
       <p className="text-muted-foreground">
-        {reviews.length} review {reviews.length === 1 ? 'decision' : 'decisions'} recorded in this session
+        {recorded} {recorded === 1 ? 'decision' : 'decisions'} recorded in this session (in memory only)
       </p>
       {confirming ? (
         <div className="mt-2 flex gap-2">

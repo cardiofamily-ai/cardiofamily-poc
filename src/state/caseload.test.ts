@@ -13,6 +13,8 @@ describe('caseload read model', () => {
       overdueActions: 4,
       cascadeTestingActions: 4,
       reclassificationReviews: 5,
+      inProgressActions: 0,
+      deferredActions: 0,
     })
   })
 

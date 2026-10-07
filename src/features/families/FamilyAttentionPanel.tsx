@@ -4,6 +4,9 @@ import { RuleTag } from '@/components/clinical/RuleTag'
 import { SafetyNote } from '@/components/clinical/SafetyNote'
 import type { IsoDate } from '@/domain/time'
 import type { FamilyOverview } from '@/state/caseload'
+import { Link } from 'react-router'
+import { ActionStatus } from '../shared/ActionStatus'
+import { actionPath } from '../shared/paths'
 import { fullName, relationshipText } from '../shared/person-text'
 
 /** Default side panel: who in this family needs attention, grouped by person. */
@@ -30,7 +33,7 @@ export function FamilyAttentionPanel({
         <p className="text-xs text-muted-foreground">
           {groups.length === 0
             ? 'No open actions in this family.'
-            : `${groups.length} ${groups.length === 1 ? 'person' : 'people'} · ${family.actions.length} open actions · select a person for details`}
+            : `${groups.length} ${groups.length === 1 ? 'person' : 'people'} · ${family.actions.length} outstanding actions`}
         </p>
       </header>
       {groups.length === 0 ? (
@@ -41,31 +44,37 @@ export function FamilyAttentionPanel({
       ) : (
         <ul className="divide-y">
           {groups.map(({ summary, actions }) => (
-            <li key={summary.person.id}>
+            <li key={summary.person.id} className="px-4 py-3">
               <button
                 type="button"
                 onClick={() => onSelect(summary.person.id)}
-                className="group w-full px-4 py-3 text-left transition-colors hover:bg-accent/50 focus-visible:bg-accent/50 focus-visible:outline-none"
+                className="group flex w-full items-center justify-between gap-2 rounded text-left focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
               >
-                <div className="flex items-center justify-between gap-2">
-                  <span className="text-sm font-medium">
-                    {fullName(summary.person)}
-                    <span className="font-normal text-muted-foreground"> · {relationshipText(summary)}</span>
-                  </span>
-                  <ChevronRight aria-hidden className="size-4 text-muted-foreground transition-transform group-hover:translate-x-0.5" />
-                </div>
-                <ul className="mt-1.5 space-y-2">
-                  {actions.map((action) => (
-                    <li key={action.id} className="text-xs">
-                      <div className="flex items-start justify-between gap-2">
+                <span className="text-sm font-medium group-hover:text-primary">
+                  {fullName(summary.person)}
+                  <span className="font-normal text-muted-foreground"> · {relationshipText(summary)}</span>
+                </span>
+                <ChevronRight aria-hidden className="size-4 text-muted-foreground transition-transform group-hover:translate-x-0.5" />
+              </button>
+              <ul className="mt-1.5 space-y-1">
+                {actions.map((action) => (
+                  <li key={action.id}>
+                    <Link
+                      to={actionPath(action.id)}
+                      className="-mx-2 block rounded-md px-2 py-1.5 text-xs transition-colors hover:bg-accent/60 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+                    >
+                      <span className="flex items-start justify-between gap-2">
                         <span className="text-foreground">{action.what}</span>
                         <RuleTag ruleId={action.ruleId} className="shrink-0" />
-                      </div>
-                      <DueLabel when={action.when} today={today} className="mt-0.5 text-xs" />
-                    </li>
-                  ))}
-                </ul>
-              </button>
+                      </span>
+                      <span className="mt-0.5 flex items-center gap-2">
+                        <DueLabel when={action.when} today={today} className="text-xs" />
+                        <ActionStatus family={family} action={action} hideOpen className="ml-auto" />
+                      </span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
             </li>
           ))}
         </ul>

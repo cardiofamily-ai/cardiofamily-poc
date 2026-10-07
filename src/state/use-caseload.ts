@@ -1,14 +1,17 @@
 import { useMemo } from 'react'
 import { SYNTHETIC_FAMILIES } from '@/data/synthetic'
 import { useClock } from './clock-context'
-import { buildCaseload, type Caseload } from './caseload'
+import { buildCaseload, findAction, type Caseload } from './caseload'
 import { buildRelativeProfile } from './relative-profile'
 import { useDemoSession } from './session-context'
 
 export function useCaseload(): Caseload {
   const today = useClock().today()
-  const { reviews } = useDemoSession()
-  return useMemo(() => buildCaseload(SYNTHETIC_FAMILIES, { today, reviews }), [today, reviews])
+  const { reviews, actionLog } = useDemoSession()
+  return useMemo(
+    () => buildCaseload(SYNTHETIC_FAMILIES, { today, reviews, actionLog }),
+    [today, reviews, actionLog],
+  )
 }
 
 export function useFamilyOverview(familyId: string | undefined) {
@@ -29,4 +32,10 @@ export function useReclassification(eventId: string | undefined) {
     if (item) return { family, item }
   }
   return undefined
+}
+
+/** Any engine action (outstanding or closed) with its family and person. */
+export function useAction(actionId: string | undefined) {
+  const caseload = useCaseload()
+  return actionId ? findAction(caseload, actionId) : undefined
 }

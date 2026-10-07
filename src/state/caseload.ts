@@ -17,6 +17,12 @@ import {
 } from '@/domain/reclassification/impact'
 import type { ReclassificationEvent } from '@/domain/reclassification/types'
 import {
+  currentWorkflow,
+  isOutstanding,
+  type ActionWorkflowEntry,
+  type CurrentWorkflow,
+} from '@/domain/action-workflow'
+import {
   acknowledgedReclassificationIds,
   currentReview,
   isOpenReviewStatus,
@@ -29,8 +35,10 @@ import type { IsoDate } from '@/domain/time'
 
 export interface EvaluationContext {
   readonly today: IsoDate
-  /** Clinician review log (session state). */
+  /** Clinician review log for reclassification impact reviews (session state). */
   readonly reviews: readonly ReviewEntry[]
+  /** Action workflow log (session state). */
+  readonly actionLog?: readonly ActionWorkflowEntry[]
 }
 
 export interface ReclassificationItem {
@@ -56,12 +64,14 @@ export interface FamilyOverview {
   readonly latestAwaitingReview: boolean
   /** All interpretations of the familial variant in force so far, oldest first. */
   readonly interpretationHistory: readonly VariantInterpretation[]
-  /** Open actions (pending or deferred clinician review), in engine priority order. */
+  /** Outstanding actions, in engine priority order. */
   readonly actions: readonly FamilyAction[]
-  /** Engine actions whose review is closed (reviewed / not applicable). */
+  /** Engine actions no longer outstanding (workflow completed / not applicable, or impact review closed). */
   readonly closedActions: readonly FamilyAction[]
-  /** Review status of every engine action, by action id. */
+  /** DEMO-R-006 items: status of their reclassification impact review, by action id. */
   readonly actionReviewStatus: Readonly<Record<string, ReviewStatus>>
+  /** All other actions: workflow state and history, by action id. */
+  readonly actionWorkflow: Readonly<Record<string, CurrentWorkflow>>
   readonly people: readonly PersonSummary[]
   /** RISK categorisation per person id. */
   readonly relativeStatuses: Readonly<Record<string, RelativeStatus>>
@@ -122,7 +132,16 @@ export function buildFamilyOverview(snapshot: FamilySnapshot, ctx: EvaluationCon
       a.ruleId === 'DEMO-R-006' ? currentReview(ctx.reviews, a.subjectId).status : 'pending-clinician-review',
     ]),
   ) as Record<string, ReviewStatus>
-  const actions = evaluated.filter((a) => isOpenReviewStatus(actionReviewStatus[a.id]!))
+  const actionWorkflow = Object.fromEntries(
+    evaluated
+      .filter((a) => a.ruleId !== 'DEMO-R-006')
+      .map((a) => [a.id, currentWorkflow(ctx.actionLog ?? [], a.id)]),
+  )
+  const outstanding = (a: FamilyAction) =>
+    a.ruleId === 'DEMO-R-006'
+      ? isOpenReviewStatus(actionReviewStatus[a.id]!)
+      : isOutstanding(actionWorkflow[a.id]!.state)
+  const actions = evaluated.filter(outstanding)
   const people = snapshot.people.map((p) => summarisePerson(snapshot, p.id, ctx.today))
   return {
     snapshot,
@@ -135,8 +154,9 @@ export function buildFamilyOverview(snapshot: FamilySnapshot, ctx: EvaluationCon
       (i) => i.effectiveDate <= ctx.today,
     ),
     actions,
-    closedActions: evaluated.filter((a) => !isOpenReviewStatus(actionReviewStatus[a.id]!)),
+    closedActions: evaluated.filter((a) => !outstanding(a)),
     actionReviewStatus,
+    actionWorkflow,
     people,
     relativeStatuses: Object.fromEntries(
       people.map((p) => [p.person.id, categoriseRelative(p, variant.id, interpretation.classification)]),
@@ -162,6 +182,8 @@ export interface Caseload {
     readonly overdueActions: number
     readonly cascadeTestingActions: number
     readonly reclassificationReviews: number
+    readonly inProgressActions: number
+    readonly deferredActions: number
   }
 }
 
@@ -195,6 +217,8 @@ export function buildCaseload(snapshots: readonly FamilySnapshot[], ctx: Evaluat
       overdueActions: sum((f) => f.overdueActions),
       cascadeTestingActions: sum((f) => f.cascadeTestingActions),
       reclassificationReviews: sum((f) => f.reclassificationReviews),
+      inProgressActions: sum((f) => f.actions.filter((a) => f.actionWorkflow[a.id]?.state === 'in-progress').length),
+      deferredActions: sum((f) => f.actions.filter((a) => f.actionWorkflow[a.id]?.state === 'deferred').length),
     },
   }
 }
@@ -216,4 +240,17 @@ export function upcomingSurveillance(caseload: Caseload) {
         .map((person) => ({ family, person, dueDate: person.surveillance.plan!.nextDueDate })),
     )
     .toSorted((a, b) => a.dueDate.localeCompare(b.dueDate))
+}
+
+/** Locates any engine action (outstanding or closed) with its family and person. */
+export function findAction(caseload: Caseload, actionId: string) {
+  for (const family of caseload.families) {
+    const action =
+      family.actions.find((a) => a.id === actionId) ?? family.closedActions.find((a) => a.id === actionId)
+    if (action) {
+      const person = family.people.find((p) => p.person.id === action.personId)!
+      return { family, action, person, outstanding: family.actions.includes(action) }
+    }
+  }
+  return undefined
 }

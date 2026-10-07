@@ -40,10 +40,10 @@ describe('Command Centre', () => {
     expect(section).toHaveTextContent('5 people may need clinician review: Maria, Hilde, Koen, Bram, Lotte')
   })
 
-  it('links each person to their relative profile', async () => {
+  it('links each queue item to its action detail', async () => {
     renderApp('/')
     const link = await screen.findByRole('link', { name: /Pieter Janssens/ })
-    expect(link).toHaveAttribute('href', '/families/fam-janssens/people/p-janssens-pieter')
+    expect(link).toHaveAttribute('href', '/actions/DEMO-R-003%3Ap-janssens-pieter%3Asp-janssens-pieter')
   })
 
   it('shows aggregate signals', async () => {

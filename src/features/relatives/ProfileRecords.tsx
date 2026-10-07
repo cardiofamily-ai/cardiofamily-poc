@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import { useLocation } from 'react-router'
 import { MODALITY_TEXT, PHENOTYPE_TEXT } from '@/components/clinical/labels'
 import { SurveillanceLabel } from '@/components/clinical/StatusLabels'
 import { dueStateOn, type IsoDate } from '@/domain/time'
@@ -39,9 +40,16 @@ function Empty({ children }: { children: ReactNode }) {
 }
 
 const rowClass = 'scroll-mt-24 transition-colors target:bg-accent'
+
+/** Highlights the record row named in the URL hash (evidence links). */
+function useRowClass() {
+  const { hash } = useLocation()
+  return (id: string) => (hash === `#${recordAnchor(id)}` ? `${rowClass} bg-accent` : rowClass)
+}
 const cell = 'px-4 py-2.5 first:pl-5 align-top'
 
 export function TestingHistory({ profile }: { profile: RelativeProfile }) {
+  const rowCls = useRowClass()
   return (
     <Section id="testing-heading" title="Genetic testing">
       {profile.tests.length === 0 ? (
@@ -49,7 +57,7 @@ export function TestingHistory({ profile }: { profile: RelativeProfile }) {
       ) : (
         <Table caption="Genetic testing history" head={['Requested', 'Test', 'Status', 'Result']}>
           {profile.tests.map((t) => (
-            <tr key={t.id} id={recordAnchor(t.id)} className={rowClass}>
+            <tr key={t.id} id={recordAnchor(t.id)} className={rowCls(t.id)}>
               <td className={cell}>{formatDisplayDate(t.requestedDate)}</td>
               <td className={cell}>
                 {t.kind === 'diagnostic' ? 'Diagnostic test' : 'Cascade test (familial variant)'}
@@ -79,6 +87,7 @@ export function TestingHistory({ profile }: { profile: RelativeProfile }) {
 }
 
 export function PhenotypeHistory({ profile }: { profile: RelativeProfile }) {
+  const rowCls = useRowClass()
   return (
     <Section id="phenotype-heading" title="Phenotype assessments">
       {profile.assessments.length === 0 ? (
@@ -86,7 +95,7 @@ export function PhenotypeHistory({ profile }: { profile: RelativeProfile }) {
       ) : (
         <Table caption="Phenotype assessment history" head={['Date', 'Modality', 'Recorded finding']}>
           {profile.assessments.map((a) => (
-            <tr key={a.id} id={recordAnchor(a.id)} className={rowClass}>
+            <tr key={a.id} id={recordAnchor(a.id)} className={rowCls(a.id)}>
               <td className={cell}>{formatDisplayDate(a.date)}</td>
               <td className={cell}>{MODALITY_TEXT[a.modality]}</td>
               <td className={cell}>{PHENOTYPE_TEXT[a.finding]}</td>
@@ -99,6 +108,7 @@ export function PhenotypeHistory({ profile }: { profile: RelativeProfile }) {
 }
 
 export function SurveillanceHistory({ profile, today }: { profile: RelativeProfile; today: IsoDate }) {
+  const rowCls = useRowClass()
   return (
     <Section id="surveillance-heading" title="Surveillance">
       {profile.plans.length === 0 ? (
@@ -106,7 +116,7 @@ export function SurveillanceHistory({ profile, today }: { profile: RelativeProfi
       ) : (
         <Table caption="Surveillance plans" head={['Plan', 'Status', 'Last review', 'Next due']}>
           {profile.plans.map((p) => (
-            <tr key={p.id} id={recordAnchor(p.id)} className={rowClass}>
+            <tr key={p.id} id={recordAnchor(p.id)} className={rowCls(p.id)}>
               <td className={cell}>{p.description}</td>
               <td className={cell}>
                 {p.status === 'active' ? (
@@ -121,6 +131,9 @@ export function SurveillanceHistory({ profile, today }: { profile: RelativeProfi
           ))}
         </Table>
       )}
+      <p className="mt-2 text-xs text-muted-foreground">
+        Surveillance records come from synthetic seed data. Recording a workflow state does not change them.
+      </p>
     </Section>
   )
 }

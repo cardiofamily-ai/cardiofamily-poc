@@ -31,7 +31,7 @@ describe('Family Workspace', () => {
   it('lists who needs attention by default', async () => {
     renderApp('/families/fam-janssens')
     const panel = await screen.findByRole('region', { name: 'Who needs attention' })
-    expect(panel).toHaveTextContent('3 people · 3 open actions')
+    expect(panel).toHaveTextContent('3 people · 3 outstanding actions')
     expect(within(panel).getAllByRole('button').map((b) => b.textContent)).toEqual([
       expect.stringContaining('Pieter Janssens'),
       expect.stringContaining('Mila Verhaegen'),

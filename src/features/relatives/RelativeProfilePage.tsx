@@ -2,12 +2,16 @@ import { ChevronRight, Network } from 'lucide-react'
 import { Link, useParams } from 'react-router'
 import { ActionDetail } from '@/components/clinical/ActionDetail'
 import { ReviewStatusBadge } from '@/components/clinical/ReviewStatusBadge'
+import { RuleTag } from '@/components/clinical/RuleTag'
+import { WorkflowStateBadge } from '@/components/clinical/WorkflowStateBadge'
 import { variantLabel } from '@/domain/actions/rules'
 import type { Evidence } from '@/domain/actions/types'
 import { formatDisplayDate } from '@/lib/format'
 import { useClock } from '@/state/clock-context'
 import type { RelativeProfile } from '@/state/relative-profile'
 import { useRelativeProfile } from '@/state/use-caseload'
+import { ActionStatus } from '../shared/ActionStatus'
+import { actionPath } from '../shared/paths'
 import { ageText, fullName, relationshipText, sexText } from '../shared/person-text'
 import { FamilyConnections } from './FamilyConnections'
 import { PhenotypeHistory, SurveillanceHistory, TestingHistory } from './ProfileRecords'
@@ -88,23 +92,30 @@ export function RelativeProfilePage() {
         <div className="space-y-8">
           <section id="open-actions" aria-labelledby="actions-heading" className="scroll-mt-24">
             <h2 id="actions-heading" className="mb-1 text-sm font-semibold">
-              Open actions · {profile.actions.length}
+              Outstanding actions · {profile.actions.length}
             </h2>
             {profile.actions.length === 0 ? (
               <p className="rounded-lg border border-dashed px-5 py-3 text-sm text-muted-foreground">
-                No open actions for this person.
+                No outstanding actions for this person.
               </p>
             ) : (
               <div className="divide-y rounded-lg border bg-card px-5">
                 {profile.actions.map((action) => (
-                  <ActionDetail key={action.id} action={action} today={today} evidenceHref={evidenceLinker(profile)} />
+                  <ActionDetail
+                    key={action.id}
+                    action={action}
+                    today={today}
+                    evidenceHref={evidenceLinker(profile)}
+                    href={actionPath(action.id)}
+                    status={<ActionStatus family={family} action={action} hideOpen />}
+                  />
                 ))}
               </div>
             )}
           </section>
 
           <section aria-labelledby="review-heading">
-            <h2 id="review-heading" className="mb-2 text-sm font-semibold">Review history</h2>
+            <h2 id="review-heading" className="mb-2 text-sm font-semibold">Action and review history</h2>
             <ReviewHistory profile={profile} />
           </section>
 
@@ -122,20 +133,38 @@ export function RelativeProfilePage() {
 }
 
 function ReviewHistory({ profile }: { profile: RelativeProfile }) {
-  const entries = profile.reclassificationImpacts.flatMap(({ item }) =>
-    item.review.history.map((entry) => ({ entry, item })),
+  const workflowEntries = profile.actionHistory.flatMap(({ action, history }) =>
+    history.map((entry) => ({ key: entry.id, entry, action })),
   )
-  if (entries.length === 0) {
+  const reviewEntries = profile.reclassificationImpacts.flatMap(({ item }) =>
+    item.review.history.map((entry) => ({ key: entry.id, entry, item })),
+  )
+  if (workflowEntries.length + reviewEntries.length === 0) {
     return (
       <p className="rounded-lg border border-dashed px-5 py-3 text-sm text-muted-foreground">
-        No clinician review recorded.
+        No workflow or clinician review recorded.
       </p>
     )
   }
   return (
     <ol className="divide-y rounded-lg border bg-card">
-      {entries.toReversed().map(({ entry, item }) => (
-        <li key={entry.id} className="flex items-start justify-between gap-4 px-5 py-3 text-sm">
+      {workflowEntries.toReversed().map(({ key, entry, action }) => (
+        <li key={key} className="flex items-start justify-between gap-4 px-5 py-3 text-sm">
+          <div>
+            <p>
+              <Link to={actionPath(action.id)} className="hover:text-primary hover:underline">{action.what}</Link>{' '}
+              <RuleTag ruleId={action.ruleId} className="ml-1" />
+            </p>
+            <p className="text-xs text-muted-foreground">
+              Workflow · {entry.recordedBy} · {formatDisplayDate(entry.date)}
+              {entry.note && ` · “${entry.note}”`}
+            </p>
+          </div>
+          <WorkflowStateBadge state={entry.state} />
+        </li>
+      ))}
+      {reviewEntries.toReversed().map(({ key, entry, item }) => (
+        <li key={key} className="flex items-start justify-between gap-4 px-5 py-3 text-sm">
           <div>
             <p>
               Reclassification impact review · {variantLabel(item.variant)}{' '}

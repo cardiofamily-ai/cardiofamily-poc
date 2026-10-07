@@ -15,6 +15,8 @@ import type { AttentionItem, Caseload, FamilyOverview, ReclassificationItem } fr
 import { upcomingSurveillance } from '@/state/caseload'
 import { useClock } from '@/state/clock-context'
 import { useCaseload } from '@/state/use-caseload'
+import { ActionStatus } from '../shared/ActionStatus'
+import { actionPath } from '../shared/paths'
 import { fullName, relationshipText } from '../shared/person-text'
 
 const isOverdue = (a: FamilyAction) => a.when.kind === 'due' && a.when.dueState === 'overdue'
@@ -40,8 +42,11 @@ export function CommandCentrePage() {
         <p className="text-xs font-semibold tracking-wider text-primary uppercase">Command Centre</p>
         <h1 className="mt-1 text-[28px] leading-tight font-semibold tracking-tight">Who needs attention now?</h1>
         <p className="mt-1.5 text-sm text-muted-foreground">
-          {totals.openActions} open actions for {totals.familiesNeedingAttention} of {totals.families} synthetic
-          families, ordered by urgency. Every item is a demonstration output awaiting clinician review.
+          {totals.openActions} outstanding actions for {totals.familiesNeedingAttention} of {totals.families} synthetic
+          families, ordered by urgency
+          {totals.inProgressActions + totals.deferredActions > 0 &&
+            ` (${totals.inProgressActions} in progress, ${totals.deferredActions} deferred)`}
+          . Every item is a demonstration output requiring clinician review.
         </p>
       </header>
 
@@ -180,8 +185,11 @@ function AttentionRow({ item, today }: { item: AttentionItem; today: IsoDate }) 
   const { action, person, family } = item
   return (
     <li>
-      <Link to={`/families/${family.snapshot.family.id}/people/${person.person.id}`} className={ROW}>
-        <DueLabel when={action.when} today={today} className="text-sm" />
+      <Link to={actionPath(action.id)} className={ROW}>
+        <span className="flex flex-col items-start gap-1.5">
+          <DueLabel when={action.when} today={today} className="text-sm" />
+          <ActionStatus family={family} action={action} hideOpen className="ml-5" />
+        </span>
         <div className="min-w-0">
           <div className="truncate text-sm font-medium">{fullName(person.person)}</div>
           <div className="truncate text-xs text-muted-foreground">
@@ -328,8 +336,8 @@ function ReclassificationStatus({ families }: { families: readonly FamilyOvervie
                 <ClassificationBadge classification={item.impact.from} />
                 <span aria-label="to">→</span>
                 <ClassificationBadge classification={item.impact.to} />
-                <ReviewStatusBadge status={item.review.status} className="ml-auto" />
               </span>
+              <ReviewStatusBadge status={item.review.status} className="mt-1.5" />
             </Link>
           </li>
         ))}

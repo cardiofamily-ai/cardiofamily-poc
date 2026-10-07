@@ -1,3 +1,5 @@
+import type { ReactNode } from 'react'
+import { Link } from 'react-router'
 import { DEMO_RULES } from '@/domain/actions/rules'
 import type { Evidence, FamilyAction } from '@/domain/actions/types'
 import type { IsoDate } from '@/domain/time'
@@ -9,17 +11,32 @@ import { SafetyNote } from './SafetyNote'
 interface ActionDetailProps {
   action: FamilyAction
   today: IsoDate
+  /** Shown beside the title, e.g. a workflow state badge. */
+  status?: ReactNode
+  /** Link to the full action page. */
+  href?: string
   /** Returns a link target for evidence whose source record is shown on the page. */
   evidenceHref?: (source: Evidence['source']) => string | undefined
 }
 
 /** Full WHAT / WHEN / WHY presentation of one engine action. */
-export function ActionDetail({ action, today, evidenceHref }: ActionDetailProps) {
+export function ActionDetail({ action, today, evidenceHref, status, href }: ActionDetailProps) {
   return (
     <article aria-label={action.what} className="space-y-2.5 py-3.5">
       <div className="flex items-start justify-between gap-3">
-        <h4 className="text-sm leading-snug font-medium">{action.what}</h4>
-        <RuleTag ruleId={action.ruleId} className="mt-px shrink-0" />
+        <h4 className="text-sm leading-snug font-medium">
+          {href ? (
+            <Link to={href} className="hover:text-primary hover:underline">
+              {action.what}
+            </Link>
+          ) : (
+            action.what
+          )}
+        </h4>
+        <span className="flex shrink-0 items-center gap-2">
+          {status}
+          <RuleTag ruleId={action.ruleId} className="mt-px" />
+        </span>
       </div>
       <DueLabel when={action.when} today={today} className="text-xs" />
       <div className="rounded-md bg-muted/60 px-3 py-2.5">

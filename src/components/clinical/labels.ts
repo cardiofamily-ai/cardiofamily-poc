@@ -4,6 +4,7 @@ import type { Classification } from '@/domain/genetics/types'
 import type { PhenotypeStatus } from '@/domain/phenotype/phenotype'
 import type { RelativeStatusCategory } from '@/domain/relative-status'
 import type { ReviewStatus } from '@/domain/review'
+import type { ActionWorkflowState } from '@/domain/action-workflow'
 import type { SurveillanceState } from '@/domain/surveillance/surveillance'
 import { formatDisplayDate } from '@/lib/format'
 
@@ -86,6 +87,15 @@ export const RELATIVE_STATUS_TEXT: Record<RelativeStatusCategory, string> = {
 export const REVIEW_STATUS_TEXT: Record<ReviewStatus, string> = {
   'pending-clinician-review': 'Pending clinician review',
   reviewed: 'Reviewed',
+  deferred: 'Deferred',
+  'not-applicable': 'Not applicable',
+}
+
+/** Workflow states — not medical conclusions. */
+export const WORKFLOW_STATE_TEXT: Record<ActionWorkflowState, string> = {
+  open: 'Open',
+  'in-progress': 'In progress',
+  completed: 'Completed',
   deferred: 'Deferred',
   'not-applicable': 'Not applicable',
 }

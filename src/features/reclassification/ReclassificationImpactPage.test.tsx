@@ -106,13 +106,13 @@ describe('Reclassification Impact', () => {
 
     // Command Centre reflects propagation
     await user.click(screen.getByRole('link', { name: 'Command Centre' }))
-    expect(await screen.findByText(/12 open actions/)).toBeInTheDocument()
+    expect(await screen.findByText(/12 outstanding actions/)).toBeInTheDocument()
     expect(screen.queryByRole('region', { name: /Variant reclassification — awaiting/ })).toBeNull()
 
     // Reset restores the seeded state
     await user.click(screen.getByRole('button', { name: 'Reset demo' }))
     await user.click(screen.getByRole('button', { name: 'Confirm reset' }))
-    expect(await screen.findByText(/14 open actions/)).toBeInTheDocument()
+    expect(await screen.findByText(/14 outstanding actions/)).toBeInTheDocument()
     expect(screen.getByRole('region', { name: /Variant reclassification — awaiting/ })).toBeInTheDocument()
   })
 
@@ -136,7 +136,7 @@ describe('Reclassification Impact', () => {
         note: 'Synthetic note', reviewer: 'Demo Clinician (fictional)', date: '2026-10-01' as never,
       }],
     })
-    expect(await screen.findByRole('region', { name: 'Review history' })).toHaveTextContent('Synthetic note')
+    expect(await screen.findByRole('region', { name: 'Action and review history' })).toHaveTextContent('Synthetic note')
     expect(screen.getByRole('region', { name: 'Next action' })).toHaveTextContent('Consider offering cascade genetic testing')
   })
 

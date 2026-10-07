@@ -1,3 +1,4 @@
+import type { ActionWorkflowEntry } from '@/domain/action-workflow'
 import type { FamilyAction } from '@/domain/actions/types'
 import type { GenotypeSummary } from '@/domain/genetics/genotype'
 import type { GeneticTest } from '@/domain/genetics/types'
@@ -22,6 +23,8 @@ export interface RelativeProfile {
   readonly tests: readonly GeneticTest[]
   readonly assessments: readonly PhenotypeAssessment[]
   readonly plans: readonly SurveillancePlan[]
+  /** Workflow history of this person's actions (outstanding or closed) that have entries. */
+  readonly actionHistory: readonly { readonly action: FamilyAction; readonly history: readonly ActionWorkflowEntry[] }[]
   /** Received reclassifications that may affect this person, with reasons and review state. */
   readonly reclassificationImpacts: readonly { readonly item: ReclassificationItem; readonly reasons: readonly ImpactReason[] }[]
 }
@@ -48,6 +51,10 @@ export function buildRelativeProfile(family: FamilyOverview, personId: string): 
       .filter((a) => a.personId === personId)
       .toSorted((a, b) => b.date.localeCompare(a.date)),
     plans: snapshot.surveillancePlans.filter((p) => p.personId === personId),
+    actionHistory: [...family.actions, ...family.closedActions]
+      .filter((a) => a.personId === personId)
+      .map((action) => ({ action, history: family.actionWorkflow[action.id]?.history ?? [] }))
+      .filter((h) => h.history.length > 0),
     reclassificationImpacts: family.reclassifications.flatMap((item) => {
       const affected = item.impact.affectedPeople.find((p) => p.personId === personId)
       return affected ? [{ item, reasons: affected.reasons }] : []

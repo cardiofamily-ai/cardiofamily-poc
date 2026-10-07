@@ -10,6 +10,8 @@ import type { PersonSummary } from '@/domain/person-summary'
 import type { IsoDate } from '@/domain/time'
 import { formatDisplayDate } from '@/lib/format'
 import type { FamilyOverview } from '@/state/caseload'
+import { ActionStatus } from '../shared/ActionStatus'
+import { actionPath } from '../shared/paths'
 import { ageText, fullName, relationshipText, sexText } from '../shared/person-text'
 
 function Row({ label, children }: { label: string; children: ReactNode }) {
@@ -102,14 +104,20 @@ export function PersonPanel({
 
       <div className="border-t px-4 pt-3">
         <h3 className="text-xs font-semibold tracking-wide text-muted-foreground uppercase">
-          Open actions · {actions.length}
+          Outstanding actions · {actions.length}
         </h3>
         {actions.length === 0 ? (
-          <p className="py-3 text-sm text-muted-foreground">No open actions for this person.</p>
+          <p className="py-3 text-sm text-muted-foreground">No outstanding actions for this person.</p>
         ) : (
           <div className="divide-y">
             {actions.map((action) => (
-              <ActionDetail key={action.id} action={action} today={today} />
+              <ActionDetail
+                key={action.id}
+                action={action}
+                today={today}
+                href={actionPath(action.id)}
+                status={<ActionStatus family={family} action={action} hideOpen />}
+              />
             ))}
           </div>
         )}
