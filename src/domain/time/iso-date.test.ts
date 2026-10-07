@@ -1,4 +1,4 @@
-import { ageOn, compareIsoDate, dueStateOn, isIsoDate, toIsoDate } from './iso-date'
+import { ageOn, compareIsoDate, daysBetween, dueStateOn, isIsoDate, toIsoDate } from './iso-date'
 
 describe('IsoDate', () => {
   it.each(['2026-10-01', '2024-02-29', '1955-12-31'])('accepts %s', (value) => {
@@ -44,5 +44,14 @@ describe('dueStateOn', () => {
   it('treats today and later as upcoming', () => {
     expect(dueStateOn(today, today)).toBe('upcoming')
     expect(dueStateOn(toIsoDate('2026-10-02'), today)).toBe('upcoming')
+  })
+})
+
+describe('daysBetween', () => {
+  it('counts calendar days in either direction', () => {
+    expect(daysBetween(toIsoDate('2026-06-30'), toIsoDate('2026-10-01'))).toBe(93)
+    expect(daysBetween(toIsoDate('2026-10-01'), toIsoDate('2026-10-14'))).toBe(13)
+    expect(daysBetween(toIsoDate('2026-10-01'), toIsoDate('2026-10-01'))).toBe(0)
+    expect(daysBetween(toIsoDate('2026-03-29'), toIsoDate('2026-03-30'))).toBe(1)
   })
 })

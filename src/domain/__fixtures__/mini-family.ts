@@ -4,7 +4,7 @@
  *
  *   Grandpa ═╤═ Grandma
  *       ┌────┴────┐
- *   Proband* ═╤═ Partner    Sibling
+ *   Proband* ═╤═ Partner    Sibling     (Partner: other parent of the children)
  *         ┌───┴───┐
  *       Child    Child2
  */

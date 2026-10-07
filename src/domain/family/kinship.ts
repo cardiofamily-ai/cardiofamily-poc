@@ -12,7 +12,7 @@ export type RelationKind =
   | 'niece-nephew'
   | 'cousin'
   | 'other-blood-relative'
-  | 'partner'
+  | 'co-parent'
   | 'unrelated'
 
 export interface Kinship {
@@ -36,8 +36,8 @@ const LABELS: Record<RelationKind, string | Record<Sex, string>> = {
   'niece-nephew': { male: 'Nephew', female: 'Niece' },
   cousin: 'Cousin',
   'other-blood-relative': 'Blood relative',
-  partner: 'Partner',
-  unrelated: 'Not related',
+  'co-parent': { male: 'Father', female: 'Mother' }, // completed with the children's names
+  unrelated: 'Not a blood relative',
 }
 
 /** Minimum generational distance from a person to each recorded ancestor (self = 0). */
@@ -112,9 +112,16 @@ export function kinship(people: readonly Person[], fromId: PersonId, toId: Perso
     return { relation, degree, label: label(relation) }
   }
 
-  const coParents = people.some((p) => p.parentIds.includes(fromId) && p.parentIds.includes(toId))
-  const relation = coParents ? 'partner' : 'unrelated'
-  return { relation, degree: null, label: label(relation) }
+  // Shared children establish parentage only; no partnership is inferred.
+  const sharedChildren = people
+    .filter((p) => p.parentIds.includes(fromId) && p.parentIds.includes(toId))
+    .toSorted((a, b) => a.dateOfBirth.localeCompare(b.dateOfBirth))
+  if (sharedChildren.length > 0) {
+    const names = sharedChildren.map((c) => c.givenName)
+    const list = names.length === 1 ? names[0] : `${names.slice(0, -1).join(', ')} and ${names.at(-1)}`
+    return { relation: 'co-parent', degree: null, label: `${label('co-parent')} of ${list}` }
+  }
+  return { relation: 'unrelated', degree: null, label: label('unrelated') }
 }
 
 export function isBloodRelative(k: Kinship): boolean {

@@ -26,7 +26,8 @@ export interface Person {
   readonly deceasedDate?: IsoDate
   /**
    * Biological parents recorded in this family (0–2). A parent who is not
-   * modelled is simply omitted. Partners are derived from shared children.
+   * modelled is simply omitted. No partner relationship is recorded or
+   * inferred; two people sharing a child are only ever described as its parents.
    */
   readonly parentIds: readonly PersonId[]
   readonly synthetic: true

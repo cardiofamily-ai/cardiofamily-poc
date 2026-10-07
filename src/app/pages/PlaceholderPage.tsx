@@ -16,7 +16,7 @@ export function PlaceholderPage({ item }: PlaceholderPageProps) {
         <Icon aria-hidden className="size-6 text-muted-foreground" />
         <p className="mt-3 text-sm font-medium">Not yet built</p>
         <p className="mt-1 text-sm text-muted-foreground">
-          Planned for implementation phase {item.plannedPhase}.
+          Planned for a later phase of the demonstration build.
         </p>
       </div>
     </div>

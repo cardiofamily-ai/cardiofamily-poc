@@ -6,6 +6,15 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
+    --color-overdue: var(--overdue);
+    --color-overdue-soft: var(--overdue-soft);
+    --color-due: var(--due);
+    --color-due-soft: var(--due-soft);
+    --color-genetics: var(--genetics);
+    --color-genetics-soft: var(--genetics-soft);
+    --color-settled: var(--settled);
+    --color-settled-soft: var(--settled-soft);
+    --color-pedigree: var(--pedigree);
     --color-notice: var(--notice);
     --color-notice-foreground: var(--notice-foreground);
     --color-notice-border: var(--notice-border);
@@ -89,6 +98,16 @@
     --notice: oklch(0.97 0.05 90);
     --notice-foreground: oklch(0.4 0.08 65);
     --notice-border: oklch(0.88 0.08 85);
+    /* Status hues. Always paired with an icon or text label, never colour alone. */
+    --overdue: oklch(0.52 0.19 27);
+    --overdue-soft: oklch(0.965 0.025 27);
+    --due: oklch(0.5 0.12 65);
+    --due-soft: oklch(0.97 0.04 85);
+    --genetics: oklch(0.48 0.15 295);
+    --genetics-soft: oklch(0.965 0.025 295);
+    --settled: oklch(0.48 0.08 170);
+    --settled-soft: oklch(0.965 0.025 170);
+    --pedigree: oklch(0.3 0.03 255);
 }
 
 .dark {

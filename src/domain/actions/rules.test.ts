@@ -23,7 +23,7 @@ describe('DEMO-R-001 cascade testing consideration', () => {
     )
   })
 
-  it('is not raised for partners, even when first-degree to a carrier child', () => {
+  it('is not raised for a parent who married in, even when first-degree to a carrier child', () => {
     const snapshot = miniFamily({ geneticTests: [...base.geneticTests, resulted('gt-child', 'child', 'detected')] })
     expect(ids(snapshot)).not.toContain('DEMO-R-001:partner:var-mini')
   })

@@ -60,3 +60,8 @@ export type DueState = 'overdue' | 'upcoming'
 export function dueStateOn(dueDate: IsoDate, today: IsoDate): DueState {
   return dueDate < today ? 'overdue' : 'upcoming'
 }
+
+/** Whole calendar days from `from` to `to` (negative if `to` is earlier). */
+export function daysBetween(from: IsoDate, to: IsoDate): number {
+  return Math.round((isoDateToUtcDate(to).getTime() - isoDateToUtcDate(from).getTime()) / 86_400_000)
+}

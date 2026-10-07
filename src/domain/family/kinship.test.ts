@@ -17,9 +17,10 @@ describe('kinship', () => {
     ['grandpa', 'child', 'grandchild', 2, 'Granddaughter'],
     ['child', 'sibling', 'aunt-uncle', 2, 'Uncle'],
     ['sibling', 'child', 'niece-nephew', 2, 'Niece'],
-    ['proband', 'partner', 'partner', null, 'Partner'],
-    ['grandpa', 'grandma', 'partner', null, 'Partner'],
-    ['sibling', 'partner', 'unrelated', null, 'Not related'],
+    ['proband', 'partner', 'co-parent', null, 'Father of child and child2'],
+    ['partner', 'proband', 'co-parent', null, 'Mother of child and child2'],
+    ['grandpa', 'grandma', 'co-parent', null, 'Mother of proband and sibling'],
+    ['sibling', 'partner', 'unrelated', null, 'Not a blood relative'],
   ] as const)('%s → %s is %s (degree %s, "%s")', (from, to, relation, degree, label) => {
     expect(k(from, to)).toEqual({ relation, degree, label })
   })
@@ -36,7 +37,7 @@ describe('kinship', () => {
     })
   })
 
-  it('treats partners as not blood-related', () => {
+  it('treats co-parents who married in as not blood-related', () => {
     expect(isBloodRelative(k('proband', 'partner'))).toBe(false)
     expect(isBloodRelative(k('proband', 'child'))).toBe(true)
   })

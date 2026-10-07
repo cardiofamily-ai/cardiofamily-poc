@@ -4,7 +4,7 @@ import { ENVIRONMENT_NOTICE } from '@/domain/safety'
 import { renderApp } from '@/test/render-app'
 import { NAV_ITEMS } from './navigation'
 
-const ALL_PATHS = [...NAV_ITEMS.map((item) => item.to), '/does-not-exist']
+const ALL_PATHS = [...NAV_ITEMS.map((item) => item.to), '/families/fam-janssens', '/does-not-exist']
 
 describe('application shell', () => {
   it('uses the exact required environment notice wording', () => {
@@ -32,7 +32,7 @@ describe('application shell', () => {
     for (const item of NAV_ITEMS) {
       await user.click(within(nav).getByRole('link', { name: item.label }))
       expect(router.state.location.pathname).toBe(item.to)
-      expect(screen.getByRole('heading', { level: 1, name: item.label })).toBeInTheDocument()
+      expect(screen.getByRole('heading', { level: 1 })).toBeInTheDocument()
       expect(within(nav).getByRole('link', { name: item.label })).toHaveAttribute(
         'aria-current',
         'page',

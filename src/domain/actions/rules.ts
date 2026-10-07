@@ -29,7 +29,7 @@ export const DEMO_RULES: Record<DemoRuleId, DemoRule> = {
     version: '1.0',
     title: 'Cascade testing consideration',
     trigger:
-      'A living blood relative of the proband who is also a first-degree relative of a genotype-positive person has no recorded test for the familial variant, and the variant is currently classified Pathogenic or Likely pathogenic. Partners who married into the family are not included.',
+      'A living blood relative of the proband who is also a first-degree relative of a genotype-positive person has no recorded test for the familial variant, and the variant is currently classified Pathogenic or Likely pathogenic. Parents who married into the family (not blood relatives of the proband) are not included.',
     notice: DEMO_RULE_NOTICE,
   },
   'DEMO-R-002': {

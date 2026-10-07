@@ -43,7 +43,7 @@ describe('Janssens family (primary cascade-care story)', () => {
       Pieter: 'Brother / positive / absent / overdue',
       Sarah: 'Self / positive / present / upcoming',
       Eline: 'Sister / untested / not-assessed / none',
-      Jonas: 'Partner / untested / not-assessed / none',
+      Jonas: 'Father of Lucas and Mila / untested / not-assessed / none',
       Lucas: 'Son / positive / absent / upcoming',
       Mila: 'Daughter / pending / absent / none',
     })
@@ -87,7 +87,7 @@ describe('Peeters family (reclassification story)', () => {
       Maria: 'Mother / untested / absent / none',
       Hilde: 'Sister / untested / absent / upcoming',
       Koen: 'Self / positive / present / upcoming',
-      Sofie: 'Partner / untested / not-assessed / none',
+      Sofie: 'Mother of Bram and Lotte / untested / not-assessed / none',
       Bram: 'Son / untested / absent / overdue',
       Lotte: 'Daughter / untested / absent / upcoming',
     })
@@ -132,7 +132,7 @@ describe('Peeters family (reclassification story)', () => {
     })
   })
 
-  it('excludes the deceased father and the partner from impact', () => {
+  it('excludes the deceased father and the children’s mother (not a blood relative) from impact', () => {
     const affected = assessReclassificationImpact(peetersFamily, event, today).affectedPeople.map((p) => p.personId)
     expect(affected).not.toContain('p-peeters-jozef')
     expect(affected).not.toContain('p-peeters-sofie')
