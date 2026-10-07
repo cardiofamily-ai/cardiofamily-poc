@@ -31,8 +31,8 @@ export function pedigreeNodeData(family: FamilyOverview, today: IsoDate): Record
         bloodRelative ? GENOTYPE_TEXT[genotypeStatus] : 'not a blood relative of the proband',
         PHENOTYPE_TEXT[summary.phenotype.status],
         actions.length === 0
-          ? 'no open actions'
-          : `${actions.length} open ${actions.length === 1 ? 'action' : 'actions'}${overdue ? `, ${overdue} overdue` : ''}`,
+          ? 'no outstanding actions'
+          : `${actions.length} outstanding ${actions.length === 1 ? 'action' : 'actions'}${overdue ? `, ${overdue} overdue` : ''}`,
       ].join(', ')
 
       return [

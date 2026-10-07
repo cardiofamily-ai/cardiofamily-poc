@@ -11,7 +11,7 @@ describe('Command Centre', () => {
     renderApp('/')
     const overdue = await screen.findByRole('region', { name: 'Overdue' })
     const rows = within(overdue).getAllByRole('link')
-    expect(rows.map((r) => within(r).getByText(/Dubois|Peeters|Janssens/, { selector: '.font-medium' }).textContent)).toEqual([
+    expect(rows.map((r) => within(r).getByText(/Dubois|Peeters|Janssens/, { selector: '.font-semibold' }).textContent)).toEqual([
       'Thomas Dubois',
       'Bram Peeters',
       'Pieter Janssens',

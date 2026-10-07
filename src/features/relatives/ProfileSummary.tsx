@@ -70,7 +70,7 @@ function NextActionPanel({ profile, today }: { profile: RelativeProfile; today: 
   if (!action) {
     return (
       <Panel label="Next action" id="panel-next">
-        <p className="text-lg font-semibold text-muted-foreground">No open actions</p>
+        <p className="text-lg font-semibold text-muted-foreground">No outstanding actions</p>
         <p className="mt-1 text-xs text-muted-foreground">
           Nothing is currently raised for this person by the demonstration rules.
         </p>
@@ -125,7 +125,10 @@ function GeneticInterpretationPanel({ profile }: { profile: RelativeProfile }) {
             </dd>
           </div>
         )}
-        <div className="text-muted-foreground">{interpretation.laboratory}</div>
+        <div>
+          <dt className="sr-only">Laboratory</dt>
+          <dd className="text-muted-foreground">{interpretation.laboratory}</dd>
+        </div>
       </dl>
 
       <div className="mt-3 border-t pt-3 text-sm">

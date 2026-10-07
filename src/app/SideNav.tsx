@@ -68,14 +68,16 @@ function ResetDemo() {
   const { reviews, actionLog, resetDemo } = useDemoSession()
   const [confirming, setConfirming] = useState(false)
   const recorded = reviews.length + actionLog.length
-  if (recorded === 0) return null
 
   return (
-    <div className="border-t border-sidebar-border px-5 py-3 text-xs">
+    <div className="border-t border-sidebar-border px-5 py-3 text-xs" aria-label="Demo session" role="group">
+      <p className="font-medium">Demo session</p>
       <p className="text-muted-foreground">
-        {recorded} {recorded === 1 ? 'decision' : 'decisions'} recorded in this session (in memory only)
+        {recorded === 0
+          ? 'No decisions recorded. In memory only; reload or reset restores the seeded demo.'
+          : `${recorded} ${recorded === 1 ? 'decision' : 'decisions'} recorded (in memory only)`}
       </p>
-      {confirming ? (
+      {recorded === 0 ? null : confirming ? (
         <div className="mt-2 flex gap-2">
           <button
             type="button"

@@ -4,7 +4,6 @@ export interface NavItem {
   to: string
   label: string
   icon: LucideIcon
-  summary: string
 }
 
 export const NAV_ITEMS: readonly NavItem[] = [
@@ -12,30 +11,25 @@ export const NAV_ITEMS: readonly NavItem[] = [
     to: '/',
     label: 'Command Centre',
     icon: Activity,
-    summary: 'Who needs attention now — overdue surveillance, testing gaps and open clinician reviews.',
   },
   {
     to: '/families',
     label: 'Families',
     icon: Users,
-    summary: 'Each family as a connected care unit: pedigree, genotype, phenotype and surveillance state.',
   },
   {
     to: '/actions',
     label: 'Actions',
     icon: ListChecks,
-    summary: 'Family Action Engine worklist — who, what, when and why, each subject to clinician review.',
   },
   {
     to: '/reclassifications',
     label: 'Reclassifications',
     icon: RefreshCcw,
-    summary: 'Variant interpretation changes and their potential impact across the family.',
   },
   {
     to: '/portal',
-    label: 'Relative Portal',
+    label: 'Relative Portal preview',
     icon: Smartphone,
-    summary: 'Preview of what an invited relative could eventually see. UI simulation only.',
   },
 ]

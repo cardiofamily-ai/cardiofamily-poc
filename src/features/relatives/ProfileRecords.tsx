@@ -4,6 +4,8 @@ import { MODALITY_TEXT, PHENOTYPE_TEXT } from '@/components/clinical/labels'
 import { SurveillanceLabel } from '@/components/clinical/StatusLabels'
 import { dueStateOn, type IsoDate } from '@/domain/time'
 import { formatDisplayDate } from '@/lib/format'
+import { WorkflowStateBadge } from '@/components/clinical/WorkflowStateBadge'
+import { closedWorkflowForRecord } from '@/state/caseload'
 import type { RelativeProfile } from '@/state/relative-profile'
 import { recordAnchor } from './record-anchor'
 
@@ -124,6 +126,12 @@ export function SurveillanceHistory({ profile, today }: { profile: RelativeProfi
                 ) : (
                   <span className="text-muted-foreground">Ended</span>
                 )}
+                {closedWorkflowForRecord(profile.family, p.id).map(({ action, workflow }) => (
+                  <span key={action.id} className="mt-1 flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
+                    Workflow item <WorkflowStateBadge state={workflow.state} className="py-0" />
+                    <span>· source record unchanged</span>
+                  </span>
+                ))}
               </td>
               <td className={cell}>{p.lastReviewDate ? formatDisplayDate(p.lastReviewDate) : '—'}</td>
               <td className={cell}>{formatDisplayDate(p.nextDueDate)}</td>
@@ -132,7 +140,7 @@ export function SurveillanceHistory({ profile, today }: { profile: RelativeProfi
         </Table>
       )}
       <p className="mt-2 text-xs text-muted-foreground">
-        Surveillance records come from synthetic seed data. Recording a workflow state does not change them.
+        Source records come from synthetic seed data. CardioFamily workflow outcomes do not alter them.
       </p>
     </Section>
   )

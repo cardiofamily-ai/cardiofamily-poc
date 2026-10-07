@@ -73,7 +73,7 @@ export function ActionsPage() {
               </tr>
             )}
             {rows.map(({ action, person, family, workflow, reviewStatus }) => (
-              <tr key={action.id} className="group relative align-top transition-colors hover:bg-accent/40">
+              <tr key={action.id} className="group relative align-top transition-colors hover:bg-accent/40 has-[a:focus-visible]:ring-2 has-[a:focus-visible]:ring-ring has-[a:focus-visible]:ring-inset">
                 <td className="py-3 pr-4 pl-5"><DueLabel when={action.when} today={today} /></td>
                 <td className="px-4 py-3">
                   <div className="font-medium">{fullName(person.person)}</div>

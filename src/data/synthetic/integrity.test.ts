@@ -194,3 +194,16 @@ describe.each(families)('%s', (_name, s) => {
     }
   })
 })
+
+describe('synthetic institutions', () => {
+  it('do not name real places that could imply a real centre or laboratory', () => {
+    const names = SYNTHETIC_FAMILIES.flatMap((s) => [
+      s.family.centre,
+      ...s.interpretations.map((i) => i.laboratory),
+      ...s.reclassificationEvents.map((e) => e.newInterpretation.laboratory),
+    ])
+    for (const name of names) {
+      expect(name).not.toMatch(/Leuven|Gent|Ghent|Antwerp|Brussel|Brabant|Liège|Luik|Bruges|Brugge|UZ |University Hospital/i)
+    }
+  })
+})

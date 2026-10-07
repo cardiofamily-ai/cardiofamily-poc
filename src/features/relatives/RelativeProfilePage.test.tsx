@@ -53,7 +53,7 @@ describe('Relative Profile', () => {
   it('shows a reduced view for someone who is not a blood relative', async () => {
     open('fam-janssens', 'p-janssens-jonas')
     expect(await screen.findByRole('region', { name: 'Risk' })).toHaveTextContent('Not a blood relative')
-    expect(screen.getByRole('region', { name: 'Next action' })).toHaveTextContent('No open actions')
+    expect(screen.getByRole('region', { name: 'Next action' })).toHaveTextContent('No outstanding actions')
     expect(screen.getByRole('region', { name: 'Genetic interpretation' })).toHaveTextContent(
       'Familial variant testing not applicable',
     )

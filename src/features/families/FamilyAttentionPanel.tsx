@@ -32,7 +32,7 @@ export function FamilyAttentionPanel({
         <h2 id="attention-heading" className="text-sm font-semibold">Who needs attention</h2>
         <p className="text-xs text-muted-foreground">
           {groups.length === 0
-            ? 'No open actions in this family.'
+            ? 'No outstanding actions in this family.'
             : `${groups.length} ${groups.length === 1 ? 'person' : 'people'} · ${family.actions.length} outstanding actions`}
         </p>
       </header>

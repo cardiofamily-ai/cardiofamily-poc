@@ -181,7 +181,7 @@ function PedigreeNode({
         </g>
       )}
 
-      {/* Attention badge: diamond = overdue action, circle = open actions */}
+      {/* Attention badge: diamond = overdue action, circle = outstanding actions */}
       {data.attention.count > 0 &&
         (data.attention.overdue > 0 ? (
           <g>

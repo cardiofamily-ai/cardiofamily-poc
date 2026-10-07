@@ -254,3 +254,14 @@ export function findAction(caseload: Caseload, actionId: string) {
   }
   return undefined
 }
+
+/**
+ * Closed workflow items (Completed / Not applicable) that are about a given
+ * source record, e.g. a surveillance plan. The record itself is unchanged.
+ */
+export function closedWorkflowForRecord(family: FamilyOverview, recordId: string) {
+  return family.closedActions.flatMap((action) => {
+    const workflow = family.actionWorkflow[action.id]
+    return action.subjectId === recordId && workflow ? [{ action, workflow }] : []
+  })
+}

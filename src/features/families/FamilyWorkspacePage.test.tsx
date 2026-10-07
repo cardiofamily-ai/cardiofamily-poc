@@ -17,7 +17,7 @@ describe('Family Workspace', () => {
     const pedigree = await screen.findByRole('group', { name: 'Pedigree of the Janssens family' })
     const nodes = within(pedigree).getAllByRole('button')
     expect(nodes).toHaveLength(8)
-    expect(within(pedigree).getByRole('button', { name: /^Pieter Janssens, Brother, 45 years, Genotype positive, No phenotype recorded, 1 open action, 1 overdue$/ })).toBeInTheDocument()
+    expect(within(pedigree).getByRole('button', { name: /^Pieter Janssens, Brother, 45 years, Genotype positive, No phenotype recorded, 1 outstanding action, 1 overdue$/ })).toBeInTheDocument()
     expect(within(pedigree).getByRole('button', { name: /^Sarah Janssens, Proband/ })).toBeInTheDocument()
   })
 

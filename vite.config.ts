@@ -6,6 +6,11 @@ import { defineConfig } from 'vite'
 
 export default defineConfig({
   plugins: [react(), tailwindcss()],
+  build: {
+    // Single ~150 kB (gzip) bundle is acceptable for this demonstration; route
+    // code-splitting is not worth the added complexity at this size.
+    chunkSizeWarningLimit: 600,
+  },
   resolve: {
     alias: { '@': fileURLToPath(new URL('./src', import.meta.url)) },
   },
@@ -14,5 +19,6 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: ['./src/test/setup.ts'],
     css: false,
+    include: ['src/**/*.test.{ts,tsx}'],
   },
 })

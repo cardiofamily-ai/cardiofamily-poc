@@ -19,7 +19,7 @@ describe('Action detail', () => {
     expect(within(why).getByRole('link', { name: 'View record' })).toHaveAttribute(
       'href', '/families/fam-janssens/people/p-janssens-pieter#record-sp-janssens-pieter',
     )
-    expect(within(detail).getByRole('region', { name: 'Rule' })).toHaveTextContent('DEMO-R-003Overdue surveillance· version 1.0')
+    expect(within(detail).getByRole('region', { name: 'Rule' })).toHaveTextContent('DEMO-R-003Overdue surveillanceRule version 1.0 · demo-engine 0.1.0')
     // 'Demonstration only — requires clinician review.'
     expect(detail).toHaveTextContent(DEMO_ACTION_DISCLAIMER)
     const panel = screen.getByRole('region', { name: 'Workflow' })
@@ -82,7 +82,7 @@ describe('canonical Janssens workflow', () => {
     expect(history).toHaveTextContent('Recall letter sent (synthetic)')
     expect(within(history).getByText('Completed')).toBeInTheDocument()
     expect(within(history).getByText('In progress')).toBeInTheDocument()
-    expect(screen.getByRole('region', { name: 'Next action' })).toHaveTextContent('No open actions')
+    expect(screen.getByRole('region', { name: 'Next action' })).toHaveTextContent('No outstanding actions')
 
     // Family workspace: Pieter has no outstanding action; the attention list no longer includes him
     await user.click(screen.getByRole('link', { name: /View in family workspace/ }))

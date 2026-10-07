@@ -1,12 +1,12 @@
 import { AlertTriangle, ChevronRight } from 'lucide-react'
 import { Link } from 'react-router'
-import { testingText } from '@/components/clinical/labels'
+import { testingText, WORKFLOW_STATE_TEXT } from '@/components/clinical/labels'
 import { GenotypeLabel, NotBloodRelativeLabel, PhenotypeLabel, SurveillanceLabel } from '@/components/clinical/StatusLabels'
 import { isBloodRelative } from '@/domain/family/kinship'
 import type { IsoDate } from '@/domain/time'
 import { formatDisplayDate } from '@/lib/format'
 import { cn } from '@/lib/utils'
-import type { FamilyOverview } from '@/state/caseload'
+import { closedWorkflowForRecord, type FamilyOverview } from '@/state/caseload'
 import { primaryAction } from '@/state/display-priority'
 import { ageText, fullName, relationshipText } from '../shared/person-text'
 
@@ -41,7 +41,7 @@ export function RelativesTable({
             <th scope="col" className="px-4 py-2.5 font-medium">Testing</th>
             <th scope="col" className="px-4 py-2.5 font-medium">Phenotype</th>
             <th scope="col" className="px-4 py-2.5 font-medium">Surveillance</th>
-            <th scope="col" className="px-4 py-2.5 font-medium">Open actions</th>
+            <th scope="col" className="px-4 py-2.5 font-medium">Outstanding actions</th>
             <th scope="col" className="w-12"><span className="sr-only">Profile</span></th>
           </tr>
         </thead>
@@ -91,6 +91,11 @@ export function RelativesTable({
                   {summary.surveillance.plan && (
                     <div className="text-xs text-muted-foreground">
                       {formatDisplayDate(summary.surveillance.plan.nextDueDate)}
+                      {closedWorkflowForRecord(family, summary.surveillance.plan.id).map(({ action, workflow }) => (
+                        <span key={action.id} className="block">
+                          Workflow item: {WORKFLOW_STATE_TEXT[workflow.state]}
+                        </span>
+                      ))}
                     </div>
                   )}
                 </td>

@@ -12,7 +12,7 @@ function plural(n: number, unit: string) {
 export function DueLabel({ when, today, className }: { when: ActionTiming; today: IsoDate; className?: string }) {
   if (when.kind === 'unscheduled') {
     return (
-      <span className={cn('inline-flex items-center gap-1.5 text-muted-foreground', className)}>
+      <span className={cn('inline-flex items-center gap-1.5 whitespace-nowrap text-muted-foreground', className)}>
         <CircleDashed aria-hidden className="size-3.5 shrink-0" />
         No due date
       </span>
@@ -22,7 +22,7 @@ export function DueLabel({ when, today, className }: { when: ActionTiming; today
   if (when.dueState === 'overdue') {
     return (
       <span className={cn('inline-flex flex-col', className)}>
-        <span className="inline-flex items-center gap-1.5 font-medium text-overdue">
+        <span className="inline-flex items-center gap-1.5 font-medium whitespace-nowrap text-overdue">
           <AlertTriangle aria-hidden className="size-3.5 shrink-0" />
           Overdue · {plural(-days, 'day')}
         </span>
@@ -32,7 +32,7 @@ export function DueLabel({ when, today, className }: { when: ActionTiming; today
   }
   return (
     <span className={cn('inline-flex flex-col', className)}>
-      <span className="inline-flex items-center gap-1.5 font-medium text-due">
+      <span className="inline-flex items-center gap-1.5 font-medium whitespace-nowrap text-due">
         <CalendarClock aria-hidden className="size-3.5 shrink-0" />
         {days === 0 ? 'Due today' : `Due in ${plural(days, 'day')}`}
       </span>

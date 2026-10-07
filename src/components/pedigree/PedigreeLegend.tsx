@@ -15,7 +15,7 @@ function Item({ symbol, children }: { symbol: ReactNode; children: ReactNode }) 
 
 export function PedigreeLegend() {
   return (
-    <ul aria-label="Pedigree legend" className="grid grid-cols-2 gap-x-6 gap-y-2 text-xs text-muted-foreground xl:grid-cols-4">
+    <ul aria-label="Pedigree legend" className="grid grid-cols-[repeat(auto-fill,minmax(190px,1fr))] gap-x-6 gap-y-2 text-xs text-muted-foreground">
       <Item symbol={<><rect x="1" y="5" width="13" height="13" rx="1" className={`${stroke} fill-card`} strokeWidth="1.5" /><circle cx="19" cy="11.5" r="6.5" className={`${stroke} fill-card`} strokeWidth="1.5" /></>}>
         Male · Female
       </Item>
@@ -35,7 +35,7 @@ export function PedigreeLegend() {
         Has an overdue action
       </Item>
       <Item symbol={<circle cx="12" cy="12" r="7" className="fill-due" />}>
-        Has open actions (count)
+        Has outstanding actions (count)
       </Item>
       <Item symbol={<><line x1="1" y1="12" x2="23" y2="12" className={stroke} strokeWidth="1.5" /></>}>
         Recorded parents of the children below

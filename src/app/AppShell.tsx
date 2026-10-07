@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react'
 import { Outlet, useLocation } from 'react-router'
-import { SafetyBanner } from './SafetyBanner'
+import { SafetyBanner } from '@/components/SafetyBanner'
 import { SideNav } from './SideNav'
 
 export function AppShell() {

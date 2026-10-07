@@ -51,7 +51,7 @@ export function ActionDetail({ action, today, evidenceHref, status, href }: Acti
                 <span>
                   {formatDatesInText(e.statement)}
                   {href && (
-                    <a href={href} className="ml-1 whitespace-nowrap text-primary hover:underline">
+                    <a href={href} className="ml-1 whitespace-nowrap text-primary underline underline-offset-2">
                       View record
                     </a>
                   )}

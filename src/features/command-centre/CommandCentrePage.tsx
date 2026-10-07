@@ -100,7 +100,7 @@ function SignalStrip({ caseload }: { caseload: Caseload }) {
     { label: 'Overdue', value: totals.overdueActions, note: 'surveillance or test follow-up', icon: AlertTriangle, tone: 'text-overdue' },
     { label: 'Cascade testing', value: totals.cascadeTestingActions, note: 'relatives to consider or follow up', icon: Dna, tone: 'text-foreground' },
     { label: 'Reclassification reviews', value: totals.reclassificationReviews, note: `${events} variant ${events === 1 ? 'event' : 'events'} awaiting impact review`, icon: RefreshCcw, tone: 'text-genetics' },
-    { label: 'Families needing attention', value: <>{totals.familiesNeedingAttention}<span className="text-base font-normal text-muted-foreground"> / {totals.families}</span></>, note: 'with at least one open action', icon: Users, tone: 'text-foreground' },
+    { label: 'Families needing attention', value: <>{totals.familiesNeedingAttention}<span className="text-base font-normal text-muted-foreground"> / {totals.families}</span></>, note: 'with at least one outstanding action', icon: Users, tone: 'text-foreground' },
   ]
   return (
     <dl className="mt-6 grid grid-cols-4 divide-x rounded-lg border bg-card">
@@ -161,13 +161,13 @@ function QueueSection({
   )
 }
 
-const ROW = 'group grid grid-cols-[156px_200px_minmax(0,1fr)_16px] items-start gap-5 py-3 pr-4 pl-5 transition-colors hover:bg-accent/50 focus-visible:bg-accent/50 focus-visible:outline-none'
+const ROW = 'group grid grid-cols-[148px_minmax(0,1fr)_16px] items-start gap-5 py-3 pr-4 pl-5 transition-colors hover:bg-accent/50 focus-visible:bg-accent/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset'
 
 function RowMeta({ ruleId }: { ruleId: DemoRuleId }) {
   return (
-    <div className="mt-1.5 flex items-center gap-2">
+    <div className="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1">
       <RuleTag ruleId={ruleId} />
-      <SafetyNote compact />
+      <SafetyNote compact className="whitespace-nowrap" />
     </div>
   )
 }
@@ -191,13 +191,14 @@ function AttentionRow({ item, today }: { item: AttentionItem; today: IsoDate }) 
           <ActionStatus family={family} action={action} hideOpen className="ml-5" />
         </span>
         <div className="min-w-0">
-          <div className="truncate text-sm font-medium">{fullName(person.person)}</div>
-          <div className="truncate text-xs text-muted-foreground">
-            {relationshipText(person)} · {family.snapshot.family.name}
+          <div className="truncate text-sm">
+            <span className="font-semibold">{fullName(person.person)}</span>
+            <span className="text-muted-foreground">
+              {' · '}
+              {relationshipText(person)} · {family.snapshot.family.name}
+            </span>
           </div>
-        </div>
-        <div className="min-w-0">
-          <div className="text-sm">{action.what}</div>
+          <div className="mt-0.5 text-sm">{action.what}</div>
           <div className="mt-0.5 line-clamp-1 text-xs text-muted-foreground">
             {formatDatesInText(action.why.summary)}
           </div>
@@ -226,12 +227,12 @@ function ReclassificationRow({ family, pending }: { family: FamilyOverview; pend
           {review.status === 'deferred' && <ReviewStatusBadge status="deferred" className="mt-1.5 ml-5 self-start" />}
         </span>
         <div className="min-w-0">
-          <div className="truncate text-sm font-medium">{family.snapshot.family.name}</div>
-          <div className="truncate text-xs text-muted-foreground">Proband {fullName(family.proband)}</div>
-        </div>
-        <div className="min-w-0">
-          <div className="flex flex-wrap items-center gap-1.5 text-sm">
-            <span className="font-medium">{variantLabel(variant)}</span>
+          <div className="truncate text-sm">
+            <span className="font-semibold">{family.snapshot.family.name}</span>
+            <span className="text-muted-foreground"> · proband {fullName(family.proband)}</span>
+          </div>
+          <div className="mt-0.5 flex flex-wrap items-center gap-1.5 text-sm">
+            <span>{variantLabel(variant)}</span>
             <ClassificationBadge classification={impact.from} />
             <span aria-label="reclassified to" className="text-muted-foreground">→</span>
             <ClassificationBadge classification={impact.to} />
@@ -288,7 +289,7 @@ function FamiliesAtAGlance({ families }: { families: readonly FamilyOverview[] }
               <span className="flex items-baseline justify-between gap-3">
                 <span className="font-medium">{f.snapshot.family.name}</span>
                 <span className="text-xs text-muted-foreground tabular-nums">
-                  {f.actions.length === 0 ? 'Up to date' : `${f.actions.length} open`}
+                  {f.actions.length === 0 ? 'Up to date' : `${f.actions.length} outstanding`}
                 </span>
               </span>
               {(f.overdueActions > 0 || f.pendingReclassifications.length > 0) && (

@@ -24,7 +24,7 @@ export function FamiliesPage() {
           <thead className="border-b bg-muted/40 text-left text-xs text-muted-foreground">
             <tr>
               <th scope="col" className="py-2.5 pr-4 pl-5 font-medium">Family</th>
-              <th scope="col" className="px-4 py-2.5 font-medium">Proband · familial variant (last acknowledged)</th>
+              <th scope="col" className="px-4 py-2.5 font-medium">Proband · familial variant<span className="block font-normal">last acknowledged classification</span></th>
               <th scope="col" className="px-4 py-2.5 font-medium">Needs attention</th>
               <th scope="col" className="px-4 py-2.5 font-medium">Overdue</th>
               <th scope="col" className="px-4 py-2.5 font-medium">Cascade testing</th>
@@ -50,11 +50,11 @@ function FamilyRow({ family }: { family: FamilyOverview }) {
   const { snapshot, proband, variant, acknowledgedInterpretation } = family
   const latest = family.reclassifications.at(-1)
   return (
-    <tr className="group relative transition-colors hover:bg-accent/40">
+    <tr className="group relative transition-colors hover:bg-accent/40 has-[a:focus-visible]:ring-2 has-[a:focus-visible]:ring-ring has-[a:focus-visible]:ring-inset">
       <td className="py-3.5 pr-4 pl-5 align-top">
         <Link
           to={`/families/${snapshot.family.id}`}
-          className="font-medium after:absolute after:inset-0 focus-visible:outline-none group-focus-within:underline"
+          className="font-medium whitespace-nowrap after:absolute after:inset-0 focus-visible:outline-none group-focus-within:underline"
         >
           {snapshot.family.name}
         </Link>
@@ -72,7 +72,7 @@ function FamilyRow({ family }: { family: FamilyOverview }) {
           <>
             <span className="font-medium tabular-nums">{family.peopleNeedingAttention}</span>
             <span className="text-muted-foreground"> of {snapshot.people.length} people</span>
-            <div className="text-xs text-muted-foreground">{family.actions.length} open actions</div>
+            <div className="text-xs text-muted-foreground">{family.actions.length} outstanding actions</div>
           </>
         ) : (
           <span className="text-settled">Up to date</span>
@@ -80,7 +80,7 @@ function FamilyRow({ family }: { family: FamilyOverview }) {
       </td>
       <td className="px-4 py-3.5 align-top">
         {family.overdueActions > 0 ? (
-          <span className="inline-flex items-center gap-1.5 font-medium text-overdue">
+          <span className="inline-flex items-center gap-1.5 font-medium whitespace-nowrap text-overdue">
             <AlertTriangle aria-hidden className="size-3.5" />
             {family.overdueActions} overdue
           </span>
@@ -106,7 +106,7 @@ function FamilyRow({ family }: { family: FamilyOverview }) {
               <ClassificationBadge classification={latest.impact.from} />
               <span aria-label="to">→</span>
               <ClassificationBadge classification={latest.impact.to} />
-              <span>· {formatDisplayDate(latest.event.receivedDate)}</span>
+              <span className="whitespace-nowrap">· {formatDisplayDate(latest.event.receivedDate)}</span>
             </div>
             <ReviewStatusBadge status={latest.review.status} className="mt-1.5" />
           </div>

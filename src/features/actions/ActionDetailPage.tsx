@@ -140,6 +140,17 @@ export function ActionDetailPage() {
             <p className="text-sm font-medium">{action.what}</p>
           </Section>
 
+          {workflow && !isOutstanding(workflow.state) && (
+            <div className="flex gap-2 border-b bg-muted/40 px-5 py-3 text-xs text-muted-foreground" aria-label="Workflow and source record">
+              <Info aria-hidden className="mt-0.5 size-3.5 shrink-0" />
+              <p>
+                <span className="font-medium text-foreground">Workflow item: {WORKFLOW_STATE_TEXT[workflow.state]}.</span>{' '}
+                The source record cited below still reflects the seeded clinical record; completing a demonstration
+                workflow item does not alter clinical data.
+              </p>
+            </div>
+          )}
+
           <Section label="When">
             <DueLabel when={action.when} today={today} className="text-sm" />
             <p className="mt-1 text-xs text-muted-foreground">
@@ -159,7 +170,7 @@ export function ActionDetailPage() {
                     {LINKABLE.has(e.source.kind) && (
                       <Link
                         to={`${profilePath(familyId, person.person.id)}#${recordAnchor(e.source.id)}`}
-                        className="ml-1.5 whitespace-nowrap text-primary hover:underline"
+                        className="ml-1.5 whitespace-nowrap text-primary underline underline-offset-2"
                       >
                         View record
                       </Link>
@@ -174,7 +185,9 @@ export function ActionDetailPage() {
             <p className="flex flex-wrap items-center gap-2 text-sm">
               <RuleTag ruleId={action.ruleId} />
               <span className="font-medium">{rule.title}</span>
-              <span className="text-muted-foreground">· version {action.ruleVersion} · {action.engineVersion}</span>
+            </p>
+            <p className="mt-0.5 text-xs text-muted-foreground">
+              Rule version {action.ruleVersion} · {action.engineVersion}
             </p>
             <p className="mt-1.5 text-sm text-muted-foreground">{rule.trigger}</p>
             <p className="mt-1.5 text-xs text-muted-foreground">{rule.notice}</p>

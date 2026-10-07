@@ -38,7 +38,7 @@ export function ReclassificationsPage() {
           </thead>
           <tbody className="divide-y">
             {items.map(({ family, item }) => (
-              <tr key={item.event.id} className="group relative transition-colors hover:bg-accent/40">
+              <tr key={item.event.id} className="group relative transition-colors hover:bg-accent/40 has-[a:focus-visible]:ring-2 has-[a:focus-visible]:ring-ring has-[a:focus-visible]:ring-inset">
                 <td className="py-3.5 pr-4 pl-5">{formatDisplayDate(item.event.receivedDate)}</td>
                 <td className="px-4 py-3.5">
                   <Link

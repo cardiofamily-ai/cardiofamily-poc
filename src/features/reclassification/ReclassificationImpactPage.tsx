@@ -142,7 +142,15 @@ function Outcome({ ref, item, family }: { ref: React.Ref<HTMLDivElement>; item: 
   )
 }
 
-function InterpretationCard({ title, interpretation, extra }: { title: string; interpretation: VariantInterpretation; extra?: string }) {
+function InterpretationCard({
+  title,
+  interpretation,
+  extra,
+}: {
+  title: string
+  interpretation: VariantInterpretation
+  extra?: { label: string; value: string }
+}) {
   return (
     <div className="min-w-0 flex-1 rounded-lg border bg-card px-4 py-3">
       <p className="text-[11px] font-semibold tracking-wider text-muted-foreground uppercase">{title}</p>
@@ -153,7 +161,12 @@ function InterpretationCard({ title, interpretation, extra }: { title: string; i
         <div><dt className="inline">Laboratory: </dt><dd className="inline">{interpretation.laboratory}</dd></div>
         <div><dt className="inline">Report: </dt><dd className="inline font-mono">{interpretation.reportReference}</dd></div>
         <div><dt className="inline">Effective: </dt><dd className="inline">{formatDisplayDate(interpretation.effectiveDate)}</dd></div>
-        {extra && <div>{extra}</div>}
+        {extra && (
+          <div>
+            <dt className="inline">{extra.label}: </dt>
+            <dd className="inline">{extra.value}</dd>
+          </div>
+        )}
       </dl>
     </div>
   )
@@ -181,7 +194,7 @@ function WhatChanged({ item, previous, family }: { item: ReclassificationItem; p
                 : 'Latest laboratory classification · awaiting clinician review'
           }
           interpretation={item.event.newInterpretation}
-          extra={`Received: ${formatDisplayDate(item.event.receivedDate)}`}
+          extra={{ label: 'Received', value: formatDisplayDate(item.event.receivedDate) }}
         />
       </div>
       <div className="mt-3 rounded-lg bg-muted/50 px-4 py-3 text-sm">
