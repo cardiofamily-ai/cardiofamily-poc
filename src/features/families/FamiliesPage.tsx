@@ -24,7 +24,7 @@ export function FamiliesPage() {
           <thead className="border-b bg-muted/40 text-left text-xs text-muted-foreground">
             <tr>
               <th scope="col" className="py-2.5 pr-4 pl-5 font-medium">Family</th>
-              <th scope="col" className="px-4 py-2.5 font-medium">Proband · familial variant</th>
+              <th scope="col" className="px-4 py-2.5 font-medium">Proband · familial variant (last acknowledged)</th>
               <th scope="col" className="px-4 py-2.5 font-medium">Needs attention</th>
               <th scope="col" className="px-4 py-2.5 font-medium">Overdue</th>
               <th scope="col" className="px-4 py-2.5 font-medium">Cascade testing</th>
@@ -47,7 +47,7 @@ export function FamiliesPage() {
 }
 
 function FamilyRow({ family }: { family: FamilyOverview }) {
-  const { snapshot, proband, variant, interpretation } = family
+  const { snapshot, proband, variant, acknowledgedInterpretation } = family
   const latest = family.reclassifications.at(-1)
   return (
     <tr className="group relative transition-colors hover:bg-accent/40">
@@ -64,7 +64,7 @@ function FamilyRow({ family }: { family: FamilyOverview }) {
         <div>{fullName(proband)}</div>
         <div className="mt-0.5 flex items-center gap-1.5 text-xs text-muted-foreground">
           {variantLabel(variant)}
-          <ClassificationBadge classification={interpretation.classification} />
+          <ClassificationBadge classification={acknowledgedInterpretation.classification} />
         </div>
       </td>
       <td className="px-4 py-3.5 align-top">

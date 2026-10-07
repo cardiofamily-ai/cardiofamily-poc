@@ -165,12 +165,21 @@ function WhatChanged({ item, previous, family }: { item: ReclassificationItem; p
     <section aria-labelledby="what-changed-heading">
       <h2 id="what-changed-heading" className="mb-3 text-base font-semibold">What changed</h2>
       <div className="flex items-stretch gap-3">
-        <InterpretationCard title="Previous classification" interpretation={previous} />
+        <InterpretationCard
+          title={item.review.status === 'reviewed' ? 'Previously acknowledged classification' : 'Last acknowledged classification'}
+          interpretation={previous}
+        />
         <div className="flex items-center text-genetics" aria-hidden>
           <ArrowRight className="size-5" />
         </div>
         <InterpretationCard
-          title="New laboratory classification"
+          title={
+            item.review.status === 'reviewed'
+              ? 'Latest laboratory classification · acknowledged'
+              : item.review.status === 'not-applicable'
+                ? 'Latest laboratory classification · marked not applicable'
+                : 'Latest laboratory classification · awaiting clinician review'
+          }
           interpretation={item.event.newInterpretation}
           extra={`Received: ${formatDisplayDate(item.event.receivedDate)}`}
         />

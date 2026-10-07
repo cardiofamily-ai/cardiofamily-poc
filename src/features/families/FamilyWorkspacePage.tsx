@@ -1,11 +1,12 @@
 import { AlertTriangle, ChevronRight } from 'lucide-react'
 import { Link, useParams, useSearchParams } from 'react-router'
-import { ClassificationBadge } from '@/components/clinical/ClassificationBadge'
+import { CLASSIFICATION_SHORT } from '@/components/clinical/labels'
 import { Pedigree } from '@/components/pedigree/Pedigree'
 import { PedigreeLegend } from '@/components/pedigree/PedigreeLegend'
 import { variantLabel } from '@/domain/actions/rules'
 import { useClock } from '@/state/clock-context'
 import { useFamilyOverview } from '@/state/use-caseload'
+import { ClassificationSummary } from '../shared/ClassificationSummary'
 import { fullName } from '../shared/person-text'
 import { FamilyAttentionPanel } from './FamilyAttentionPanel'
 import { pedigreeNodeData } from './pedigree-data'
@@ -31,7 +32,7 @@ export function FamilyWorkspacePage() {
     )
   }
 
-  const { snapshot, proband, variant, interpretation } = family
+  const { snapshot, proband, variant } = family
   const selectedId = params.get('person')
   const selected = family.people.find((p) => p.person.id === selectedId)
   const select = (personId: string | null) =>
@@ -59,7 +60,7 @@ export function FamilyWorkspacePage() {
             </span>
             <span aria-hidden>·</span>
             <span className="font-medium text-foreground">{variantLabel(variant)}</span>
-            <ClassificationBadge classification={interpretation.classification} />
+            <ClassificationSummary family={family} />
             <span aria-hidden>·</span>
             <span>{snapshot.people.length} people recorded</span>
           </p>
@@ -88,6 +89,13 @@ export function FamilyWorkspacePage() {
           <ReclassificationNotice item={item} />
         </div>
       ))}
+      {family.latestAwaitingReview && (
+        <p className="mt-2 text-xs text-muted-foreground">
+          RISK and actions in this family are derived from the last acknowledged classification (
+          {CLASSIFICATION_SHORT[family.acknowledgedInterpretation.classification]}) while the newer laboratory report
+          awaits clinician review.
+        </p>
+      )}
 
       <div className="mt-5 grid grid-cols-[minmax(0,1fr)_384px] items-start gap-5">
         <section aria-labelledby="pedigree-heading" className="rounded-lg border bg-card">

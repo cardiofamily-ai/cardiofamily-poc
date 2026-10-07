@@ -9,10 +9,10 @@ describe('Reclassification Impact', () => {
   it('shows the previous and new laboratory classification with report context', async () => {
     renderApp(IMPACT)
     const changed = await screen.findByRole('region', { name: 'What changed' })
-    expect(changed).toHaveTextContent('Previous classification')
+    expect(changed).toHaveTextContent('Last acknowledged classification')
     expect(changed).toHaveTextContent('VUS')
     expect(changed).toHaveTextContent('SYN-MDG-2023-0877')
-    expect(changed).toHaveTextContent('New laboratory classification')
+    expect(changed).toHaveTextContent('Latest laboratory classification · awaiting clinician review')
     expect(changed).toHaveTextContent('Likely pathogenic')
     expect(changed).toHaveTextContent('SYN-MDG-2026-1203')
     expect(changed).toHaveTextContent('Received: 24 Sept 2026')
@@ -99,7 +99,10 @@ describe('Reclassification Impact', () => {
     expect(after).toHaveTextContent('Reviewed')
     expect(after).toHaveTextContent('No care has been changed.')
     expect(screen.getByRole('region', { name: 'Who needs attention' })).toHaveTextContent('Consider offering cascade genetic testing')
-    expect(screen.getByRole('heading', { level: 1 }).closest('header')).toHaveTextContent('Likely pathogenic')
+    const header = screen.getByRole('heading', { level: 1 }).closest('header')!
+    expect(header).toHaveTextContent('Last acknowledged classificationLikely pathogenic')
+    expect(header).toHaveTextContent('Latest laboratory classificationLikely pathogenic')
+    expect(header).not.toHaveTextContent('Pending clinician review')
 
     // Command Centre reflects propagation
     await user.click(screen.getByRole('link', { name: 'Command Centre' }))

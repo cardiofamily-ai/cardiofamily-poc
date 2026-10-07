@@ -32,6 +32,7 @@ export interface RelativeStatus {
 
 const DEGREE = ['', 'first', 'second', 'third']
 
+/** `classification` is the last clinician-acknowledged classification of the familial variant. */
 export function categoriseRelative(
   summary: PersonSummary,
   variantId: VariantId,
@@ -56,7 +57,7 @@ export function categoriseRelative(
 
   const genotype: GenotypeSummary = summary.genotypes.find((g) => g.variantId === variantId) ?? { status: 'untested' }
   const test = genotype.test
-  basis.push(`Familial variant currently classified ${CLASSIFICATION_LABELS[classification]}.`)
+  basis.push(`Last acknowledged classification of the familial variant: ${CLASSIFICATION_LABELS[classification]}.`)
 
   switch (genotype.status) {
     case 'positive': {

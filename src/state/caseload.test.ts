@@ -31,13 +31,13 @@ describe('caseload read model', () => {
       reclassificationReviews: 0,
     })
     expect(janssens.proband.id).toBe('p-janssens-sarah')
-    expect(janssens.interpretation.classification).toBe('pathogenic')
+    expect(janssens.acknowledgedInterpretation.classification).toBe('pathogenic')
     expect(janssens.pendingReclassifications).toEqual([])
   })
 
   it('exposes the pending Peeters reclassification with its impact', () => {
     const peeters = caseload.families.find((f) => f.snapshot.family.id === 'fam-peeters')!
-    expect(peeters.interpretation.classification).toBe('vus')
+    expect(peeters.acknowledgedInterpretation.classification).toBe('vus')
     expect(peeters.pendingReclassifications).toHaveLength(1)
     expect(peeters.pendingReclassifications[0]!.impact.affectedPeople).toHaveLength(5)
   })

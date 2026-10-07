@@ -38,7 +38,7 @@ export function ProfileSummary({ profile, today }: { profile: RelativeProfile; t
 }
 
 function RiskPanel({ profile }: { profile: RelativeProfile }) {
-  const { status } = profile
+  const { status, family } = profile
   return (
     <Panel label="Risk" id="panel-risk">
       <p className="text-lg leading-snug font-semibold">{RELATIVE_STATUS_TEXT[status.category]}</p>
@@ -50,6 +50,13 @@ function RiskPanel({ profile }: { profile: RelativeProfile }) {
           </li>
         ))}
       </ul>
+      {family.latestAwaitingReview && (
+        <p className="mt-2 text-xs text-genetics">
+          Derived from the last acknowledged classification (
+          {CLASSIFICATION_SHORT[family.acknowledgedInterpretation.classification]}); a newer laboratory report awaits
+          clinician review.
+        </p>
+      )}
       <p className="mt-auto flex items-center gap-1 pt-3 text-[11px] text-muted-foreground">
         <Info aria-hidden className="size-3 shrink-0" />
         {DEMO_CATEGORISATION_NOTICE}
@@ -92,21 +99,34 @@ function NextActionPanel({ profile, today }: { profile: RelativeProfile; today: 
 
 function GeneticInterpretationPanel({ profile }: { profile: RelativeProfile }) {
   const { family, summary, genotype, reclassificationImpacts } = profile
-  const { variant, interpretation, interpretationHistory } = family
-  const previous = interpretationHistory.at(-2)
+  const { variant, acknowledgedInterpretation: interpretation, latestLaboratoryInterpretation: latest } = family
   return (
     <Panel label="Genetic interpretation" id="panel-genetics">
-      <div className="flex flex-wrap items-center gap-2">
-        <span className="text-lg font-semibold">{variantLabel(variant)}</span>
-        <ClassificationBadge classification={interpretation.classification} />
-      </div>
-      <p className="mt-0.5 text-xs text-muted-foreground">
-        Laboratory classification · {formatDisplayDate(interpretation.effectiveDate)}
-        {previous && ` (previously ${CLASSIFICATION_SHORT[previous.classification]})`}
-      </p>
-      <p className="text-xs text-muted-foreground">
-        {interpretation.laboratory} · {interpretation.reportReference}
-      </p>
+      <p className="text-lg font-semibold">{variantLabel(variant)}</p>
+      <dl className="mt-1 space-y-1.5 text-xs">
+        <div>
+          <dt className="text-muted-foreground">Last acknowledged classification</dt>
+          <dd className="mt-0.5 flex flex-wrap items-center gap-1.5">
+            <ClassificationBadge classification={interpretation.classification} />
+            <span className="text-muted-foreground">
+              {formatDisplayDate(interpretation.effectiveDate)} · {interpretation.reportReference}
+            </span>
+          </dd>
+        </div>
+        {family.reclassifications.length > 0 && (
+          <div>
+            <dt className="text-muted-foreground">Latest laboratory classification</dt>
+            <dd className="mt-0.5 flex flex-wrap items-center gap-1.5">
+              <ClassificationBadge classification={latest.classification} />
+              <span className="text-muted-foreground">
+                {formatDisplayDate(latest.effectiveDate)} · {latest.reportReference}
+              </span>
+              {family.latestAwaitingReview && <ReviewStatusBadge status="pending-clinician-review" className="py-0" />}
+            </dd>
+          </div>
+        )}
+        <div className="text-muted-foreground">{interpretation.laboratory}</div>
+      </dl>
 
       <div className="mt-3 border-t pt-3 text-sm">
         {isBloodRelative(summary.relationshipToProband) ? (

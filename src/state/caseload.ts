@@ -45,8 +45,15 @@ export interface FamilyOverview {
   readonly snapshot: FamilySnapshot
   readonly proband: Person
   readonly variant: Variant
-  /** Current interpretation, including clinician-acknowledged reclassifications. */
-  readonly interpretation: VariantInterpretation
+  /**
+   * Last acknowledged classification: the seeded interpretation plus any
+   * reclassification a clinician has reviewed. RISK and actions use this.
+   */
+  readonly acknowledgedInterpretation: VariantInterpretation
+  /** Latest laboratory classification received, whether or not it has been reviewed. */
+  readonly latestLaboratoryInterpretation: VariantInterpretation
+  /** True while a received laboratory reclassification awaits clinician review (pending or deferred). */
+  readonly latestAwaitingReview: boolean
   /** All interpretations of the familial variant in force so far, oldest first. */
   readonly interpretationHistory: readonly VariantInterpretation[]
   /** Open actions (pending or deferred clinician review), in engine priority order. */
@@ -87,8 +94,9 @@ export function buildFamilyOverview(snapshot: FamilySnapshot, ctx: EvaluationCon
   const acknowledged = received.filter((e) => acknowledgedIds.includes(e.id))
   const effective = applyReclassifications(snapshot, acknowledged)
   const interpretation = variant && currentInterpretation(effective.interpretations, variant.id, ctx.today)
-  if (!variant || !interpretation) {
-    throw new Error(`${snapshot.family.id}: no familial variant with a current interpretation`)
+  const latest = variant && currentInterpretation(applyReclassifications(snapshot, received).interpretations, variant.id, ctx.today)
+  if (!variant || !interpretation || !latest) {
+    throw new Error(`${snapshot.family.id}: no familial variant with an acknowledged interpretation`)
   }
 
   const reclassifications = received.map((event) => ({
@@ -120,7 +128,9 @@ export function buildFamilyOverview(snapshot: FamilySnapshot, ctx: EvaluationCon
     snapshot,
     proband,
     variant,
-    interpretation,
+    acknowledgedInterpretation: interpretation,
+    latestLaboratoryInterpretation: latest,
+    latestAwaitingReview: reclassifications.some((r) => isOpenReviewStatus(r.review.status)),
     interpretationHistory: interpretationHistory(effective.interpretations, variant.id).filter(
       (i) => i.effectiveDate <= ctx.today,
     ),

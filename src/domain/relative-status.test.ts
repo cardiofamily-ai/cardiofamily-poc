@@ -57,7 +57,7 @@ describe('categoriseRelative', () => {
   it('explains the categorisation using recorded facts only', () => {
     expect(categorise('child2').basis).toEqual([
       'Son of the proband (first-degree relative).',
-      'Familial variant currently classified Pathogenic.',
+      'Last acknowledged classification of the familial variant: Pathogenic.',
       'Familial variant detected (result 2025-03-01).',
       'No phenotype recorded (latest assessment 2025-04-01).',
     ])

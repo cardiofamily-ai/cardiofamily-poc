@@ -91,3 +91,24 @@ describe('Relative Profile', () => {
     expect(await screen.findByRole('heading', { name: 'Person not found' })).toBeInTheDocument()
   })
 })
+
+describe('Relative Profile classification terminology', () => {
+  it('distinguishes last acknowledged and latest laboratory classification while review is pending', async () => {
+    renderApp('/families/fam-peeters/people/p-peeters-koen')
+    const genetics = await screen.findByRole('region', { name: 'Genetic interpretation' })
+    expect(genetics).toHaveTextContent('Last acknowledged classificationVUS')
+    expect(genetics).toHaveTextContent('Latest laboratory classificationLikely pathogenic')
+    expect(genetics).toHaveTextContent('Pending clinician review')
+    expect(screen.getByRole('region', { name: 'Risk' })).toHaveTextContent(
+      'Derived from the last acknowledged classification (VUS); a newer laboratory report awaits clinician review.',
+    )
+    expect(screen.getByRole('main')).not.toHaveTextContent(/current classification/i)
+  })
+
+  it('shows a single acknowledged classification for families without a reclassification', async () => {
+    renderApp('/families/fam-janssens/people/p-janssens-pieter')
+    const genetics = await screen.findByRole('region', { name: 'Genetic interpretation' })
+    expect(genetics).toHaveTextContent('Last acknowledged classificationPathogenic')
+    expect(genetics).not.toHaveTextContent('Latest laboratory classification')
+  })
+})

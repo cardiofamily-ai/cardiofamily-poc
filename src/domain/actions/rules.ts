@@ -29,7 +29,7 @@ export const DEMO_RULES: Record<DemoRuleId, DemoRule> = {
     version: '1.0',
     title: 'Cascade testing consideration',
     trigger:
-      'A living blood relative of the proband who is also a first-degree relative of a genotype-positive person has no recorded test for the familial variant, and the variant is currently classified Pathogenic or Likely pathogenic. Parents who married into the family (not blood relatives of the proband) are not included.',
+      'A living blood relative of the proband who is also a first-degree relative of a genotype-positive person has no recorded test for the familial variant, and the variant’s last acknowledged classification is Pathogenic or Likely pathogenic. Parents who married into the family (not blood relatives of the proband) are not included.',
     notice: DEMO_RULE_NOTICE,
   },
   'DEMO-R-002': {
@@ -52,7 +52,7 @@ export const DEMO_RULES: Record<DemoRuleId, DemoRule> = {
     version: '1.0',
     title: 'Genotype-positive without surveillance plan',
     trigger:
-      'A living person is genotype positive for a variant currently classified Pathogenic or Likely pathogenic and has no active surveillance plan recorded.',
+      'A living person is genotype positive for a variant whose last acknowledged classification is Pathogenic or Likely pathogenic and has no active surveillance plan recorded.',
     notice: DEMO_RULE_NOTICE,
   },
   'DEMO-R-005': {
@@ -60,7 +60,7 @@ export const DEMO_RULES: Record<DemoRuleId, DemoRule> = {
     version: '1.0',
     title: 'Variant of uncertain significance',
     trigger:
-      'A living person is genotype positive for a variant currently classified as a VUS. Under these demonstration rules a VUS does not prompt cascade testing (see DEMO-R-001).',
+      'A living person is genotype positive for a variant whose last acknowledged classification is VUS. Under these demonstration rules a VUS does not prompt cascade testing (see DEMO-R-001).',
     notice: DEMO_RULE_NOTICE,
   },
   'DEMO-R-006': {

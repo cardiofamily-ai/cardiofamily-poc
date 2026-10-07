@@ -19,7 +19,9 @@ describe('reclassification review workflow', () => {
   it('pending: impact review items are open and the workflow is unchanged', () => {
     const o = overview([])
     expect(o.reclassifications[0]!.review.status).toBe('pending-clinician-review')
-    expect(o.interpretation.classification).toBe('vus')
+    expect(o.acknowledgedInterpretation.classification).toBe('vus')
+    expect(o.latestLaboratoryInterpretation.classification).toBe('likely-pathogenic')
+    expect(o.latestAwaitingReview).toBe(true)
     expect(rules([])).toEqual([
       'DEMO-R-003 bram', 'DEMO-R-005 koen', 'DEMO-R-006 bram', 'DEMO-R-006 hilde',
       'DEMO-R-006 koen', 'DEMO-R-006 lotte', 'DEMO-R-006 maria',
@@ -28,7 +30,8 @@ describe('reclassification review workflow', () => {
 
   it('deferred: workflow unchanged; impact review stays open with Deferred status', () => {
     const o = overview([entry(1, 'deferred', 'MDT')])
-    expect(o.interpretation.classification).toBe('vus')
+    expect(o.acknowledgedInterpretation.classification).toBe('vus')
+    expect(o.latestAwaitingReview).toBe(true)
     expect(o.pendingReclassifications).toHaveLength(1)
     expect(rules([entry(1, 'deferred')])).toEqual(rules([]))
     const r006 = o.actions.filter((a) => a.ruleId === 'DEMO-R-006')
@@ -37,7 +40,9 @@ describe('reclassification review workflow', () => {
 
   it('reviewed: the new classification is applied and resulting items await clinician review', () => {
     const o = overview([entry(1, 'reviewed')])
-    expect(o.interpretation.classification).toBe('likely-pathogenic')
+    expect(o.acknowledgedInterpretation.classification).toBe('likely-pathogenic')
+    expect(o.latestLaboratoryInterpretation.classification).toBe('likely-pathogenic')
+    expect(o.latestAwaitingReview).toBe(false)
     expect(o.pendingReclassifications).toEqual([])
     expect(rules([entry(1, 'reviewed')])).toEqual([
       'DEMO-R-003 bram', 'DEMO-R-001 bram', 'DEMO-R-001 hilde', 'DEMO-R-001 lotte', 'DEMO-R-001 maria',
@@ -54,7 +59,9 @@ describe('reclassification review workflow', () => {
 
   it('not applicable: workflow unchanged and impact review items closed', () => {
     const o = overview([entry(1, 'not-applicable')])
-    expect(o.interpretation.classification).toBe('vus')
+    expect(o.acknowledgedInterpretation.classification).toBe('vus')
+    expect(o.latestLaboratoryInterpretation.classification).toBe('likely-pathogenic')
+    expect(o.latestAwaitingReview).toBe(false)
     expect(o.pendingReclassifications).toEqual([])
     expect(rules([entry(1, 'not-applicable')])).toEqual(['DEMO-R-003 bram', 'DEMO-R-005 koen'])
     expect(o.closedActions.map((a) => a.ruleId)).toEqual(Array(5).fill('DEMO-R-006'))
