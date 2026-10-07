@@ -3,17 +3,12 @@ import { SYNTHETIC_FAMILIES } from '@/data/synthetic'
 import { useClock } from './clock-context'
 import { buildCaseload, type Caseload } from './caseload'
 import { buildRelativeProfile } from './relative-profile'
-
-/** Reclassification acknowledgement becomes session state in a later phase. */
-const NO_ACKNOWLEDGEMENTS: readonly string[] = []
+import { useDemoSession } from './session-context'
 
 export function useCaseload(): Caseload {
-  const clock = useClock()
-  const today = clock.today()
-  return useMemo(
-    () => buildCaseload(SYNTHETIC_FAMILIES, { today, acknowledgedReclassificationIds: NO_ACKNOWLEDGEMENTS }),
-    [today],
-  )
+  const today = useClock().today()
+  const { reviews } = useDemoSession()
+  return useMemo(() => buildCaseload(SYNTHETIC_FAMILIES, { today, reviews }), [today, reviews])
 }
 
 export function useFamilyOverview(familyId: string | undefined) {
@@ -24,4 +19,14 @@ export function useFamilyOverview(familyId: string | undefined) {
 export function useRelativeProfile(familyId: string | undefined, personId: string | undefined) {
   const family = useFamilyOverview(familyId)
   return family && personId ? buildRelativeProfile(family, personId) : undefined
+}
+
+/** A received reclassification event with its family context. */
+export function useReclassification(eventId: string | undefined) {
+  const caseload = useCaseload()
+  for (const family of caseload.families) {
+    const item = family.reclassifications.find((r) => r.event.id === eventId)
+    if (item) return { family, item }
+  }
+  return undefined
 }

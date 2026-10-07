@@ -57,6 +57,8 @@ export interface FamilyAction {
   readonly familyId: FamilyId
   /** WHO */
   readonly personId: PersonId
+  /** The record the action is about (variant, test, plan or reclassification event id). */
+  readonly subjectId: string
   readonly category: ActionCategory
   /** WHAT — neutral, "consider"-style wording. */
   readonly what: string

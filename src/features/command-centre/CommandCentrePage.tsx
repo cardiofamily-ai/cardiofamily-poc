@@ -3,6 +3,7 @@ import type { ReactNode } from 'react'
 import { Link } from 'react-router'
 import { ClassificationBadge } from '@/components/clinical/ClassificationBadge'
 import { DueLabel } from '@/components/clinical/DueLabel'
+import { ReviewStatusBadge } from '@/components/clinical/ReviewStatusBadge'
 import { RuleTag } from '@/components/clinical/RuleTag'
 import { SafetyNote } from '@/components/clinical/SafetyNote'
 import { variantLabel } from '@/domain/actions/rules'
@@ -10,7 +11,7 @@ import type { DemoRuleId, FamilyAction } from '@/domain/actions/types'
 import type { IsoDate } from '@/domain/time'
 import { formatDatesInText, formatDisplayDate } from '@/lib/format'
 import { cn } from '@/lib/utils'
-import type { AttentionItem, Caseload, FamilyOverview, PendingReclassification } from '@/state/caseload'
+import type { AttentionItem, Caseload, FamilyOverview, ReclassificationItem } from '@/state/caseload'
 import { upcomingSurveillance } from '@/state/caseload'
 import { useClock } from '@/state/clock-context'
 import { useCaseload } from '@/state/use-caseload'
@@ -78,6 +79,7 @@ export function CommandCentrePage() {
         </section>
 
         <aside className="space-y-8">
+          <ReclassificationStatus families={caseload.families} />
           <UpcomingSurveillance caseload={caseload} />
           <FamiliesAtAGlance families={caseload.families} />
         </aside>
@@ -92,7 +94,7 @@ function SignalStrip({ caseload }: { caseload: Caseload }) {
   const signals: { label: string; value: ReactNode; note: string; icon: LucideIcon; tone: string }[] = [
     { label: 'Overdue', value: totals.overdueActions, note: 'surveillance or test follow-up', icon: AlertTriangle, tone: 'text-overdue' },
     { label: 'Cascade testing', value: totals.cascadeTestingActions, note: 'relatives to consider or follow up', icon: Dna, tone: 'text-foreground' },
-    { label: 'Reclassification reviews', value: totals.reclassificationReviews, note: `${events} variant ${events === 1 ? 'event' : 'events'} received`, icon: RefreshCcw, tone: 'text-genetics' },
+    { label: 'Reclassification reviews', value: totals.reclassificationReviews, note: `${events} variant ${events === 1 ? 'event' : 'events'} awaiting impact review`, icon: RefreshCcw, tone: 'text-genetics' },
     { label: 'Families needing attention', value: <>{totals.familiesNeedingAttention}<span className="text-base font-normal text-muted-foreground"> / {totals.families}</span></>, note: 'with at least one open action', icon: Users, tone: 'text-foreground' },
   ]
   return (
@@ -199,20 +201,21 @@ function AttentionRow({ item, today }: { item: AttentionItem; today: IsoDate }) 
   )
 }
 
-function ReclassificationRow({ family, pending }: { family: FamilyOverview; pending: PendingReclassification }) {
-  const { event, variant, impact } = pending
+function ReclassificationRow({ family, pending }: { family: FamilyOverview; pending: ReclassificationItem }) {
+  const { event, variant, impact, review } = pending
   const names = impact.affectedPeople.map(
     (p) => family.people.find((s) => s.person.id === p.personId)!.person.givenName,
   )
   return (
     <li>
-      <Link to={`/families/${family.snapshot.family.id}`} className={ROW}>
+      <Link to={`/reclassifications/${event.id}`} className={ROW}>
         <span className="inline-flex flex-col text-sm">
           <span className="inline-flex items-center gap-1.5 font-medium text-genetics">
             <RefreshCcw aria-hidden className="size-3.5" />
             Received
           </span>
           <span className="pl-5 text-xs text-muted-foreground">{formatDisplayDate(event.receivedDate)}</span>
+          {review.status === 'deferred' && <ReviewStatusBadge status="deferred" className="mt-1.5 ml-5 self-start" />}
         </span>
         <div className="min-w-0">
           <div className="truncate text-sm font-medium">{family.snapshot.family.name}</div>
@@ -226,8 +229,8 @@ function ReclassificationRow({ family, pending }: { family: FamilyOverview; pend
             <ClassificationBadge classification={impact.to} />
           </div>
           <div className="mt-0.5 text-xs text-muted-foreground">
-            {names.length} people may need clinician review: {names.join(', ')}. No pathway changes applied
-            until acknowledged.
+            {names.length} people may need clinician review: {names.join(', ')}. Workflow unchanged until a
+            clinician records the impact review.
           </div>
           <RowMeta ruleId="DEMO-R-006" />
         </div>
@@ -296,6 +299,37 @@ function FamiliesAtAGlance({ families }: { families: readonly FamilyOverview[] }
                   )}
                 </span>
               )}
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </section>
+  )
+}
+
+function ReclassificationStatus({ families }: { families: readonly FamilyOverview[] }) {
+  const items = families.flatMap((family) => family.reclassifications.map((item) => ({ family, item })))
+  if (items.length === 0) return null
+  return (
+    <section aria-labelledby="reclassification-status-heading">
+      <div className="flex items-baseline justify-between border-b pb-2">
+        <h2 id="reclassification-status-heading" className="text-sm font-semibold">Reclassifications</h2>
+        <Link to="/reclassifications" className="text-xs text-primary hover:underline">View all</Link>
+      </div>
+      <ul className="mt-1 divide-y">
+        {items.map(({ family, item }) => (
+          <li key={item.event.id}>
+            <Link to={`/reclassifications/${item.event.id}`} className="block py-2 text-sm hover:text-primary">
+              <span className="flex items-baseline justify-between gap-2">
+                <span className="font-medium">{family.snapshot.family.name}</span>
+                <span className="text-xs text-muted-foreground">{formatDisplayDate(item.event.receivedDate)}</span>
+              </span>
+              <span className="mt-1 flex items-center gap-1.5 text-xs">
+                <ClassificationBadge classification={item.impact.from} />
+                <span aria-label="to">→</span>
+                <ClassificationBadge classification={item.impact.to} />
+                <ReviewStatusBadge status={item.review.status} className="ml-auto" />
+              </span>
             </Link>
           </li>
         ))}

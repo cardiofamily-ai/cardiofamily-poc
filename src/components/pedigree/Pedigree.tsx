@@ -26,12 +26,14 @@ interface PedigreeProps {
   readonly label: string
   readonly selectedId?: PersonId | null
   readonly onSelect?: (personId: PersonId) => void
+  /** People to emphasise, e.g. those potentially affected by a reclassification. */
+  readonly highlightIds?: ReadonlySet<PersonId>
 }
 
 const PAD_X = 28
 const R = SYMBOL_SIZE / 2
 
-export function Pedigree({ people, data, label, selectedId, onSelect }: PedigreeProps) {
+export function Pedigree({ people, data, label, selectedId, onSelect, highlightIds }: PedigreeProps) {
   const layout = useMemo(() => layoutPedigree(people), [people])
   const byId = useMemo(() => new Map(people.map((p) => [p.id, p])), [people])
   const width = layout.width + PAD_X * 2
@@ -61,6 +63,7 @@ export function Pedigree({ people, data, label, selectedId, onSelect }: Pedigree
             person={person}
             data={d}
             selected={selectedId === node.personId}
+            highlighted={highlightIds?.has(node.personId) ?? false}
             {...(onSelect ? { onSelect } : {})}
           />
         )
@@ -74,12 +77,14 @@ function PedigreeNode({
   person,
   data,
   selected,
+  highlighted,
   onSelect,
 }: {
   node: PlacedNode
   person: Person
   data: PedigreeNodeData
   selected: boolean
+  highlighted: boolean
   onSelect?: (id: PersonId) => void
 }) {
   const { x, y } = node
@@ -123,6 +128,11 @@ function PedigreeNode({
         )}
         strokeWidth={1.5}
       />
+
+      {/* Highlight halo (e.g. potentially affected by a reclassification) */}
+      {highlighted && (
+        <circle cx={x} cy={y} r={R + 9} className="fill-genetics-soft stroke-genetics/60" strokeWidth={1.5} strokeDasharray="3 2" />
+      )}
 
       {/* Symbol: square = male, circle = female; filled = phenotype recorded */}
       {person.sex === 'male' ? (

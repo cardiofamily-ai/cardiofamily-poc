@@ -13,22 +13,32 @@ import { categoriseRelative, type RelativeStatus } from '@/domain/relative-statu
 import {
   applyReclassifications,
   assessReclassificationImpact,
-  pendingReclassifications,
   type ReclassificationImpact,
 } from '@/domain/reclassification/impact'
 import type { ReclassificationEvent } from '@/domain/reclassification/types'
+import {
+  acknowledgedReclassificationIds,
+  currentReview,
+  isOpenReviewStatus,
+  type CurrentReview,
+  type ReviewEntry,
+  type ReviewStatus,
+} from '@/domain/review'
 import { getProband, type FamilySnapshot } from '@/domain/snapshot'
 import type { IsoDate } from '@/domain/time'
 
 export interface EvaluationContext {
   readonly today: IsoDate
-  readonly acknowledgedReclassificationIds: readonly string[]
+  /** Clinician review log (session state). */
+  readonly reviews: readonly ReviewEntry[]
 }
 
-export interface PendingReclassification {
+export interface ReclassificationItem {
   readonly event: ReclassificationEvent
   readonly variant: Variant
+  /** Impact relative to the family without this event applied. */
   readonly impact: ReclassificationImpact
+  readonly review: CurrentReview
 }
 
 export interface FamilyOverview {
@@ -39,11 +49,19 @@ export interface FamilyOverview {
   readonly interpretation: VariantInterpretation
   /** All interpretations of the familial variant in force so far, oldest first. */
   readonly interpretationHistory: readonly VariantInterpretation[]
+  /** Open actions (pending or deferred clinician review), in engine priority order. */
   readonly actions: readonly FamilyAction[]
+  /** Engine actions whose review is closed (reviewed / not applicable). */
+  readonly closedActions: readonly FamilyAction[]
+  /** Review status of every engine action, by action id. */
+  readonly actionReviewStatus: Readonly<Record<string, ReviewStatus>>
   readonly people: readonly PersonSummary[]
   /** RISK categorisation per person id. */
   readonly relativeStatuses: Readonly<Record<string, RelativeStatus>>
-  readonly pendingReclassifications: readonly PendingReclassification[]
+  /** Every reclassification received on or before today, with its review state. */
+  readonly reclassifications: readonly ReclassificationItem[]
+  /** Reclassifications whose impact review is still open (pending or deferred). */
+  readonly pendingReclassifications: readonly ReclassificationItem[]
   /** Distinct people with at least one open action. */
   readonly peopleNeedingAttention: number
   readonly overdueActions: number
@@ -64,16 +82,39 @@ export function buildFamilyOverview(snapshot: FamilySnapshot, ctx: EvaluationCon
   const proband = getProband(snapshot)
   const diagnostic = snapshot.geneticTests.find((t) => t.personId === proband.id && t.kind === 'diagnostic')
   const variant = snapshot.variants.find((v) => v.id === diagnostic?.variantId) ?? snapshot.variants[0]
-  const acknowledged = snapshot.reclassificationEvents.filter(
-    (e) => e.receivedDate <= ctx.today && ctx.acknowledgedReclassificationIds.includes(e.id),
-  )
+  const received = snapshot.reclassificationEvents.filter((e) => e.receivedDate <= ctx.today)
+  const acknowledgedIds = acknowledgedReclassificationIds(ctx.reviews, received.map((e) => e.id))
+  const acknowledged = received.filter((e) => acknowledgedIds.includes(e.id))
   const effective = applyReclassifications(snapshot, acknowledged)
   const interpretation = variant && currentInterpretation(effective.interpretations, variant.id, ctx.today)
   if (!variant || !interpretation) {
     throw new Error(`${snapshot.family.id}: no familial variant with a current interpretation`)
   }
 
-  const actions = evaluateFamilyActions(snapshot, ctx)
+  const reclassifications = received.map((event) => ({
+    event,
+    variant: snapshot.variants.find((v) => v.id === event.variantId) ?? variant,
+    impact: assessReclassificationImpact(
+      applyReclassifications(snapshot, acknowledged.filter((e) => e.id !== event.id)),
+      event,
+      ctx.today,
+    ),
+    review: currentReview(ctx.reviews, event.id),
+  }))
+
+  // Engine output is unchanged; review status is an overlay. DEMO-R-006 items
+  // take the status of their reclassification event's impact review.
+  const evaluated = evaluateFamilyActions(snapshot, {
+    today: ctx.today,
+    acknowledgedReclassificationIds: acknowledgedIds,
+  })
+  const actionReviewStatus = Object.fromEntries(
+    evaluated.map((a) => [
+      a.id,
+      a.ruleId === 'DEMO-R-006' ? currentReview(ctx.reviews, a.subjectId).status : 'pending-clinician-review',
+    ]),
+  ) as Record<string, ReviewStatus>
+  const actions = evaluated.filter((a) => isOpenReviewStatus(actionReviewStatus[a.id]!))
   const people = snapshot.people.map((p) => summarisePerson(snapshot, p.id, ctx.today))
   return {
     snapshot,
@@ -84,19 +125,14 @@ export function buildFamilyOverview(snapshot: FamilySnapshot, ctx: EvaluationCon
       (i) => i.effectiveDate <= ctx.today,
     ),
     actions,
+    closedActions: evaluated.filter((a) => !isOpenReviewStatus(actionReviewStatus[a.id]!)),
+    actionReviewStatus,
     people,
     relativeStatuses: Object.fromEntries(
       people.map((p) => [p.person.id, categoriseRelative(p, variant.id, interpretation.classification)]),
     ),
-    pendingReclassifications: pendingReclassifications(
-      snapshot,
-      ctx.acknowledgedReclassificationIds,
-      ctx.today,
-    ).map((event) => ({
-      event,
-      variant: snapshot.variants.find((v) => v.id === event.variantId) ?? variant,
-      impact: assessReclassificationImpact(snapshot, event, ctx.today),
-    })),
+    reclassifications,
+    pendingReclassifications: reclassifications.filter((r) => isOpenReviewStatus(r.review.status)),
     peopleNeedingAttention: new Set(actions.map((a) => a.personId)).size,
     overdueActions: actions.filter(isOverdue).length,
     cascadeTestingActions: actions.filter((a) => a.category === 'cascade-testing').length,

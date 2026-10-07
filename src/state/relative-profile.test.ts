@@ -3,7 +3,7 @@ import { SYNTHETIC_FAMILIES } from '@/data/synthetic'
 import { buildCaseload } from './caseload'
 import { buildRelativeProfile } from './relative-profile'
 
-const caseload = buildCaseload(SYNTHETIC_FAMILIES, { today: DEMO_TODAY, acknowledgedReclassificationIds: [] })
+const caseload = buildCaseload(SYNTHETIC_FAMILIES, { today: DEMO_TODAY, reviews: [] })
 const family = (id: string) => caseload.families.find((f) => f.snapshot.family.id === id)!
 const profile = (familyId: string, personId: string) => buildRelativeProfile(family(familyId), personId)!
 
@@ -39,12 +39,12 @@ describe('relative profile read model', () => {
   })
 
   it('attaches pending reclassification impact only to affected people', () => {
-    expect(profile('fam-peeters', 'p-peeters-hilde').pendingImpacts[0]!.reasons.map((r) => r.kind)).toEqual([
+    expect(profile('fam-peeters', 'p-peeters-hilde').reclassificationImpacts[0]!.reasons.map((r) => r.kind)).toEqual([
       'action-raised',
       'surveillance-plan',
     ])
-    expect(profile('fam-peeters', 'p-peeters-sofie').pendingImpacts).toEqual([])
-    expect(profile('fam-janssens', 'p-janssens-pieter').pendingImpacts).toEqual([])
+    expect(profile('fam-peeters', 'p-peeters-sofie').reclassificationImpacts).toEqual([])
+    expect(profile('fam-janssens', 'p-janssens-pieter').reclassificationImpacts).toEqual([])
   })
 })
 

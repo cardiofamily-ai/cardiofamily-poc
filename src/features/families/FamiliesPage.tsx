@@ -1,6 +1,7 @@
 import { AlertTriangle, ChevronRight, RefreshCcw } from 'lucide-react'
 import { Link } from 'react-router'
 import { ClassificationBadge } from '@/components/clinical/ClassificationBadge'
+import { ReviewStatusBadge } from '@/components/clinical/ReviewStatusBadge'
 import { variantLabel } from '@/domain/actions/rules'
 import { formatDisplayDate } from '@/lib/format'
 import type { FamilyOverview } from '@/state/caseload'
@@ -47,7 +48,7 @@ export function FamiliesPage() {
 
 function FamilyRow({ family }: { family: FamilyOverview }) {
   const { snapshot, proband, variant, interpretation } = family
-  const pending = family.pendingReclassifications[0]
+  const latest = family.reclassifications.at(-1)
   return (
     <tr className="group relative transition-colors hover:bg-accent/40">
       <td className="py-3.5 pr-4 pl-5 align-top">
@@ -95,18 +96,19 @@ function FamilyRow({ family }: { family: FamilyOverview }) {
         )}
       </td>
       <td className="px-4 py-3.5 align-top">
-        {pending ? (
+        {latest ? (
           <div>
             <span className="inline-flex items-center gap-1.5 font-medium text-genetics">
               <RefreshCcw aria-hidden className="size-3.5" />
               Reclassification received
             </span>
             <div className="mt-0.5 flex items-center gap-1.5 text-xs text-muted-foreground">
-              <ClassificationBadge classification={pending.impact.from} />
+              <ClassificationBadge classification={latest.impact.from} />
               <span aria-label="to">→</span>
-              <ClassificationBadge classification={pending.impact.to} />
-              <span>· {formatDisplayDate(pending.event.receivedDate)}</span>
+              <ClassificationBadge classification={latest.impact.to} />
+              <span>· {formatDisplayDate(latest.event.receivedDate)}</span>
             </div>
+            <ReviewStatusBadge status={latest.review.status} className="mt-1.5" />
           </div>
         ) : (
           <span className="text-muted-foreground">No new events</span>

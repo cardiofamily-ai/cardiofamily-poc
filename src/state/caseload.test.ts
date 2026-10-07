@@ -2,7 +2,7 @@ import { DEMO_TODAY } from '@/data/demo-config'
 import { SYNTHETIC_FAMILIES } from '@/data/synthetic'
 import { buildCaseload, upcomingSurveillance } from './caseload'
 
-const caseload = buildCaseload(SYNTHETIC_FAMILIES, { today: DEMO_TODAY, acknowledgedReclassificationIds: [] })
+const caseload = buildCaseload(SYNTHETIC_FAMILIES, { today: DEMO_TODAY, reviews: [] })
 
 describe('caseload read model', () => {
   it('totals open work across the synthetic caseload', () => {

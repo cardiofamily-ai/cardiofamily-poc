@@ -1,6 +1,8 @@
 import { ChevronRight, Network } from 'lucide-react'
 import { Link, useParams } from 'react-router'
 import { ActionDetail } from '@/components/clinical/ActionDetail'
+import { ReviewStatusBadge } from '@/components/clinical/ReviewStatusBadge'
+import { variantLabel } from '@/domain/actions/rules'
 import type { Evidence } from '@/domain/actions/types'
 import { formatDisplayDate } from '@/lib/format'
 import { useClock } from '@/state/clock-context'
@@ -103,9 +105,7 @@ export function RelativeProfilePage() {
 
           <section aria-labelledby="review-heading">
             <h2 id="review-heading" className="mb-2 text-sm font-semibold">Review history</h2>
-            <p className="rounded-lg border border-dashed px-5 py-3 text-sm text-muted-foreground">
-              No clinician review recorded.
-            </p>
+            <ReviewHistory profile={profile} />
           </section>
 
           <TestingHistory profile={profile} />
@@ -118,5 +118,39 @@ export function RelativeProfilePage() {
         </aside>
       </div>
     </div>
+  )
+}
+
+function ReviewHistory({ profile }: { profile: RelativeProfile }) {
+  const entries = profile.reclassificationImpacts.flatMap(({ item }) =>
+    item.review.history.map((entry) => ({ entry, item })),
+  )
+  if (entries.length === 0) {
+    return (
+      <p className="rounded-lg border border-dashed px-5 py-3 text-sm text-muted-foreground">
+        No clinician review recorded.
+      </p>
+    )
+  }
+  return (
+    <ol className="divide-y rounded-lg border bg-card">
+      {entries.toReversed().map(({ entry, item }) => (
+        <li key={entry.id} className="flex items-start justify-between gap-4 px-5 py-3 text-sm">
+          <div>
+            <p>
+              Reclassification impact review · {variantLabel(item.variant)}{' '}
+              <Link to={`/reclassifications/${item.event.id}`} className="text-xs text-primary hover:underline">
+                Open
+              </Link>
+            </p>
+            <p className="text-xs text-muted-foreground">
+              {entry.reviewer} · {formatDisplayDate(entry.date)}
+              {entry.note && ` · “${entry.note}”`}
+            </p>
+          </div>
+          <ReviewStatusBadge status={entry.status} />
+        </li>
+      ))}
+    </ol>
   )
 }

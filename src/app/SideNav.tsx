@@ -1,8 +1,10 @@
-import { HeartPulse } from 'lucide-react'
+import { HeartPulse, RotateCcw } from 'lucide-react'
+import { useState } from 'react'
 import { NavLink } from 'react-router'
 import { formatDisplayDate } from '@/lib/format'
 import { cn } from '@/lib/utils'
 import { useClock } from '@/state/clock-context'
+import { useDemoSession } from '@/state/session-context'
 import { NAV_ITEMS } from './navigation'
 
 export function SideNav() {
@@ -45,6 +47,8 @@ export function SideNav() {
         </ul>
       </nav>
 
+      <ResetDemo />
+
       <dl className="space-y-2 border-t border-sidebar-border px-5 py-4 text-xs">
         <div>
           <dt className="text-muted-foreground">Demo date</dt>
@@ -56,5 +60,50 @@ export function SideNav() {
         </div>
       </dl>
     </aside>
+  )
+}
+
+/** Clears in-memory review decisions, restoring the seeded demonstration. */
+function ResetDemo() {
+  const { reviews, resetDemo } = useDemoSession()
+  const [confirming, setConfirming] = useState(false)
+  if (reviews.length === 0) return null
+
+  return (
+    <div className="border-t border-sidebar-border px-5 py-3 text-xs">
+      <p className="text-muted-foreground">
+        {reviews.length} review {reviews.length === 1 ? 'decision' : 'decisions'} recorded in this session
+      </p>
+      {confirming ? (
+        <div className="mt-2 flex gap-2">
+          <button
+            type="button"
+            onClick={() => {
+              resetDemo()
+              setConfirming(false)
+            }}
+            className="rounded-md bg-primary px-2.5 py-1 font-medium text-primary-foreground hover:bg-primary/90 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+          >
+            Confirm reset
+          </button>
+          <button
+            type="button"
+            onClick={() => setConfirming(false)}
+            className="rounded-md border px-2.5 py-1 hover:bg-sidebar-accent focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+          >
+            Cancel
+          </button>
+        </div>
+      ) : (
+        <button
+          type="button"
+          onClick={() => setConfirming(true)}
+          className="mt-2 inline-flex items-center gap-1.5 rounded-md border px-2.5 py-1 font-medium hover:bg-sidebar-accent focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+        >
+          <RotateCcw aria-hidden className="size-3" />
+          Reset demo
+        </button>
+      )}
+    </div>
   )
 }

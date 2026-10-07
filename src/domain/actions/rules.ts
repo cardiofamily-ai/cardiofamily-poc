@@ -94,6 +94,7 @@ export function createAction(input: ActionInput): FamilyAction {
     engineVersion: ENGINE_VERSION,
     familyId: input.snapshot.family.id,
     personId: input.person.id,
+    subjectId: input.subjectId,
     category: input.category,
     what: input.what,
     when: input.when,

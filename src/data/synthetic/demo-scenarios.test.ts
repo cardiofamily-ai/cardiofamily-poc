@@ -197,7 +197,13 @@ describe('whole dataset', () => {
 
 describe('RISK categorisation (descriptive, demonstration only)', () => {
   const categories = (s: FamilySnapshot, acknowledged: string[] = []) =>
-    buildFamilyOverview(s, { today, acknowledgedReclassificationIds: acknowledged })
+    buildFamilyOverview(s, {
+      today,
+      reviews: acknowledged.map((subjectId, i) => ({
+        id: `rev-${i + 1}`, subjectId, subjectKind: 'reclassification-event' as const, status: 'reviewed' as const,
+        reviewer: 'Demo Clinician (fictional)', date: today,
+      })),
+    })
 
   it('Janssens', () => {
     const { relativeStatuses } = categories(janssensFamily)

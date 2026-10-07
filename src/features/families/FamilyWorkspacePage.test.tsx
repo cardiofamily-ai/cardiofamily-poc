@@ -89,9 +89,11 @@ describe('Family Workspace', () => {
 
   it('flags a pending reclassification without changing pathways', async () => {
     renderApp('/families/fam-peeters')
-    const notice = await screen.findByRole('region', { name: 'Variant reclassification received' })
+    const notice = await screen.findByRole('region', { name: 'Variant reclassification' })
     expect(notice).toHaveTextContent('5 people may need clinician review')
-    expect(notice).toHaveTextContent('pathways are unchanged until a clinician acknowledges')
+    expect(notice).toHaveTextContent('pathways are unchanged until a clinician records the impact review')
+    expect(notice).toHaveTextContent('Pending clinician review')
+    expect(within(notice).getByRole('link', { name: /Open impact review/ })).toHaveAttribute('href', '/reclassifications/rc-peeters-1')
     expect(notice).toHaveTextContent('DEMO-R-006')
   })
 

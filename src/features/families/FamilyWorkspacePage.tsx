@@ -83,9 +83,9 @@ export function FamilyWorkspacePage() {
         </dl>
       </header>
 
-      {family.pendingReclassifications.map((pending) => (
-        <div key={pending.event.id} className="mt-4">
-          <ReclassificationNotice pending={pending} />
+      {family.reclassifications.map((item) => (
+        <div key={item.event.id} className="mt-4">
+          <ReclassificationNotice item={item} />
         </div>
       ))}
 

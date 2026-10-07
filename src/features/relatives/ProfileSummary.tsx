@@ -1,8 +1,10 @@
 import { Info, RefreshCcw } from 'lucide-react'
+import { Link } from 'react-router'
 import type { ReactNode } from 'react'
 import { ClassificationBadge } from '@/components/clinical/ClassificationBadge'
 import { DueLabel } from '@/components/clinical/DueLabel'
 import { CLASSIFICATION_SHORT, RELATIVE_STATUS_TEXT, testingText } from '@/components/clinical/labels'
+import { ReviewStatusBadge } from '@/components/clinical/ReviewStatusBadge'
 import { RuleTag } from '@/components/clinical/RuleTag'
 import { SafetyNote } from '@/components/clinical/SafetyNote'
 import { GenotypeLabel } from '@/components/clinical/StatusLabels'
@@ -89,7 +91,7 @@ function NextActionPanel({ profile, today }: { profile: RelativeProfile; today: 
 }
 
 function GeneticInterpretationPanel({ profile }: { profile: RelativeProfile }) {
-  const { family, summary, genotype, pendingImpacts } = profile
+  const { family, summary, genotype, reclassificationImpacts } = profile
   const { variant, interpretation, interpretationHistory } = family
   const previous = interpretationHistory.at(-2)
   return (
@@ -117,19 +119,32 @@ function GeneticInterpretationPanel({ profile }: { profile: RelativeProfile }) {
         )}
       </div>
 
-      {pendingImpacts.map(({ pending }) => (
+      {reclassificationImpacts.map(({ item }) => (
         <div
-          key={pending.event.id}
-          className="mt-3 flex gap-2 rounded-md border border-genetics/25 bg-genetics-soft px-3 py-2 text-xs"
+          key={item.event.id}
+          className="mt-3 rounded-md border border-genetics/25 bg-genetics-soft px-3 py-2 text-xs"
         >
-          <RefreshCcw aria-hidden className="mt-0.5 size-3.5 shrink-0 text-genetics" />
-          <p>
-            <span className="font-medium text-genetics">New laboratory report received</span>{' '}
-            {formatDisplayDate(pending.event.receivedDate)}:{' '}
-            <ClassificationBadge classification={pending.impact.from} /> →{' '}
-            <ClassificationBadge classification={pending.impact.to} />. May affect this person; awaiting clinician
-            impact review.
+          <p className="flex flex-wrap items-center gap-1.5">
+            <RefreshCcw aria-hidden className="size-3.5 shrink-0 text-genetics" />
+            <span className="font-medium text-genetics">Laboratory reclassification</span>
+            <span className="text-muted-foreground">{formatDisplayDate(item.event.receivedDate)}</span>
+            <ClassificationBadge classification={item.impact.from} />
+            <span aria-label="to">→</span>
+            <ClassificationBadge classification={item.impact.to} />
           </p>
+          <p className="mt-1.5 flex flex-wrap items-center gap-2">
+            <ReviewStatusBadge status={item.review.status} />
+            <span className="text-muted-foreground">
+              {item.review.status === 'reviewed'
+                ? 'Impact reviewed; new classification applied to the demonstration workflow.'
+                : item.review.status === 'not-applicable'
+                  ? 'Marked not applicable; workflow unchanged.'
+                  : 'May affect this person; workflow unchanged until reviewed.'}
+            </span>
+          </p>
+          <Link to={`/reclassifications/${item.event.id}`} className="mt-1 inline-block font-medium text-primary hover:underline">
+            Open impact review
+          </Link>
         </div>
       ))}
     </Panel>

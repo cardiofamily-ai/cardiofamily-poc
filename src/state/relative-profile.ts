@@ -6,7 +6,7 @@ import type { PhenotypeAssessment } from '@/domain/phenotype/types'
 import type { ImpactReason } from '@/domain/reclassification/impact'
 import type { RelativeStatus } from '@/domain/relative-status'
 import type { SurveillancePlan } from '@/domain/surveillance/types'
-import type { FamilyOverview, PendingReclassification } from './caseload'
+import type { FamilyOverview, ReclassificationItem } from './caseload'
 import { primaryAction } from './display-priority'
 
 export interface RelativeProfile {
@@ -22,8 +22,8 @@ export interface RelativeProfile {
   readonly tests: readonly GeneticTest[]
   readonly assessments: readonly PhenotypeAssessment[]
   readonly plans: readonly SurveillancePlan[]
-  /** Unacknowledged reclassifications that may affect this person, with reasons. */
-  readonly pendingImpacts: readonly { readonly pending: PendingReclassification; readonly reasons: readonly ImpactReason[] }[]
+  /** Received reclassifications that may affect this person, with reasons and review state. */
+  readonly reclassificationImpacts: readonly { readonly item: ReclassificationItem; readonly reasons: readonly ImpactReason[] }[]
 }
 
 const testDate = (t: GeneticTest) => (t.status === 'resulted' ? t.resultDate : t.requestedDate)
@@ -48,9 +48,9 @@ export function buildRelativeProfile(family: FamilyOverview, personId: string): 
       .filter((a) => a.personId === personId)
       .toSorted((a, b) => b.date.localeCompare(a.date)),
     plans: snapshot.surveillancePlans.filter((p) => p.personId === personId),
-    pendingImpacts: family.pendingReclassifications.flatMap((pending) => {
-      const affected = pending.impact.affectedPeople.find((p) => p.personId === personId)
-      return affected ? [{ pending, reasons: affected.reasons }] : []
+    reclassificationImpacts: family.reclassifications.flatMap((item) => {
+      const affected = item.impact.affectedPeople.find((p) => p.personId === personId)
+      return affected ? [{ item, reasons: affected.reasons }] : []
     }),
   }
 }

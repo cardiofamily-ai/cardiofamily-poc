@@ -9,7 +9,7 @@ export function RuleTag({ ruleId, className }: { ruleId: DemoRuleId; className?:
     <span
       title={`${rule.title} (v${rule.version}) — ${rule.notice}`}
       className={cn(
-        'inline-flex items-center rounded bg-muted px-1.5 py-px font-mono text-[11px] text-muted-foreground',
+        'inline-flex items-center rounded bg-muted px-1.5 py-px font-mono text-[11px] whitespace-nowrap text-muted-foreground',
         className,
       )}
     >

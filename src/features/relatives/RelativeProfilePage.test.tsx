@@ -64,8 +64,9 @@ describe('Relative Profile', () => {
   it('flags a pending reclassification that may affect this person', async () => {
     open('fam-peeters', 'p-peeters-hilde')
     const genetics = await screen.findByRole('region', { name: 'Genetic interpretation' })
-    expect(genetics).toHaveTextContent('New laboratory report received')
-    expect(genetics).toHaveTextContent('awaiting clinician impact review')
+    expect(genetics).toHaveTextContent('Laboratory reclassification')
+    expect(genetics).toHaveTextContent('Pending clinician review')
+    expect(genetics).toHaveTextContent('workflow unchanged until reviewed')
     expect(screen.getByRole('region', { name: 'Risk' })).toHaveTextContent('At-risk relative / not yet tested')
   })
 

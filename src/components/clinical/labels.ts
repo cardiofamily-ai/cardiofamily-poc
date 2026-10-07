@@ -3,6 +3,7 @@ import type { GenotypeStatus, GenotypeSummary } from '@/domain/genetics/genotype
 import type { Classification } from '@/domain/genetics/types'
 import type { PhenotypeStatus } from '@/domain/phenotype/phenotype'
 import type { RelativeStatusCategory } from '@/domain/relative-status'
+import type { ReviewStatus } from '@/domain/review'
 import type { SurveillanceState } from '@/domain/surveillance/surveillance'
 import { formatDisplayDate } from '@/lib/format'
 
@@ -80,4 +81,11 @@ export const RELATIVE_STATUS_TEXT: Record<RelativeStatusCategory, string> = {
   'vus-detected': 'Variant of uncertain significance detected',
   'not-blood-relative': 'Not a blood relative',
   'not-categorised': 'Not categorised',
+}
+
+export const REVIEW_STATUS_TEXT: Record<ReviewStatus, string> = {
+  'pending-clinician-review': 'Pending clinician review',
+  reviewed: 'Reviewed',
+  deferred: 'Deferred',
+  'not-applicable': 'Not applicable',
 }
