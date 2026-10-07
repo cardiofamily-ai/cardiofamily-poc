@@ -1,0 +1,47 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["react", "typescript", "oxc", "import"],
+  "rules": {
+    "react/rules-of-hooks": "error",
+    "react/only-export-components": ["warn", { "allowConstantExport": true }]
+  },
+  "overrides": [
+    {
+      "files": ["src/domain/**"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "patterns": [
+              {
+                "group": ["react", "react-dom", "react-router", "react/*", "lucide-react"],
+                "message": "domain/ must stay framework-free: no React or UI libraries."
+              },
+              {
+                "group": ["@/app", "@/app/*", "@/components", "@/components/*", "@/features", "@/features/*", "@/state", "@/state/*", "@/data", "@/data/*", "@/lib", "@/lib/*", "@/test/*"],
+                "message": "domain/ may only import from domain/ (no components, features, state, data, lib or app)."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": ["src/components/**"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "patterns": [
+              {
+                "group": ["@/features/*", "@/state/*", "@/data/*", "@/app/*"],
+                "message": "Shared components are presentational: data and state flow in through props."
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "ignorePatterns": ["dist", "node_modules", "src/components/ui/**"]
+}
