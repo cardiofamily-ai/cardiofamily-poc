@@ -1,9 +1,10 @@
-import { expect, test } from './fixtures'
+import { enterPoc, expect, test } from './fixtures'
 
 test.use({ viewport: { width: 1280, height: 800 } })
 
 const ROUTES = [
-  '/',
+  '/', // fresh load → Welcome
+  '/guide',
   '/families',
   '/families/fam-janssens',
   '/families/fam-peeters',
@@ -15,9 +16,10 @@ const ROUTES = [
   '/portal',
 ]
 
-for (const path of ROUTES) {
+for (const path of [...ROUTES, 'Command Centre']) {
   test(`1280×800 has no horizontal overflow: ${path}`, async ({ page }) => {
-    await page.goto(path)
+    if (path === 'Command Centre') await enterPoc(page)
+    else await page.goto(path)
     await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
     const overflow = await page.evaluate(() => {
       const main = document.querySelector('main')

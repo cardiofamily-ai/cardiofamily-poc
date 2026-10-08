@@ -12,7 +12,10 @@ requires clinician review."
 
 ## Opening — Command Centre (1 min)
 
-1. Land on **Command Centre**. Read the question: *"Who needs attention now?"*
+1. A fresh load opens the **Welcome** page (purpose, what the POC shows, the
+   two stories). Click **Enter CardioFamily POC** to land on the **Command
+   Centre**. Read the question: *"Who needs attention now?"* A short in-app
+   version of this guide is under **Demo guide** in the sidebar.
 2. Point to the attention queue: overdue items first (Thomas, Bram, **Pieter**,
    Claire), then a laboratory **reclassification awaiting impact review**,
    then upcoming and undated items.

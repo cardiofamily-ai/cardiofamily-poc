@@ -1,11 +1,10 @@
-import { expect, test } from './fixtures'
-
+import { enterPoc, expect, test } from './fixtures'
 
 test('primary interactions work from the keyboard', async ({ page }) => {
-  await page.goto('/')
+  await enterPoc(page)
   // Tab through the page in order: reach Pieter's overdue row and open it
   let reached = false
-  for (let i = 0; i < 40 && !reached; i++) {
+  for (let i = 0; i < 45 && !reached; i++) {
     await page.keyboard.press('Tab')
     reached = await page.evaluate(() => {
       const t = document.activeElement?.textContent ?? ''

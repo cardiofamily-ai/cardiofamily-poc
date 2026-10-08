@@ -1,7 +1,7 @@
-import { expect, nav, resetDemo, test } from './fixtures'
+import { enterPoc, expect, nav, resetDemo, test } from './fixtures'
 
 test('Story A — family care gap followed through to a workflow outcome', async ({ page }) => {
-  await page.goto('/')
+  await enterPoc(page)
   await expect(page.getByRole('heading', { level: 1, name: 'Who needs attention now?' })).toBeVisible()
   await expect(page.getByText(/^14 outstanding actions/)).toBeVisible()
   const overdue = page.getByRole('region', { name: 'Overdue' })

@@ -1,12 +1,12 @@
 import AxeBuilder from '@axe-core/playwright'
-import { expect, test } from './fixtures'
+import { enterPoc, expect, test } from './fixtures'
 
 const NOTICE = 'CardioFamily POC is best viewed on a desktop or larger screen.'
 
 test.describe('below 1024px', () => {
   test.use({ viewport: { width: 390, height: 844 } })
 
-  for (const path of ['/', '/portal']) {
+  for (const path of ['/', '/guide', '/portal']) {
     test(`shows the notice without blocking the app: ${path}`, async ({ page }) => {
       await page.goto(path)
       const notice = page.getByRole('note', { name: 'Screen size notice' })
@@ -22,8 +22,18 @@ test.describe('below 1024px', () => {
   }
 })
 
+test.describe('Welcome page on a phone', () => {
+  test.use({ viewport: { width: 390, height: 844 } })
+  test('reflows without horizontal scrolling and keeps the CTA reachable', async ({ page }) => {
+    await page.goto('/')
+    await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
+    expect(await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth)).toBeLessThanOrEqual(0)
+    await page.getByRole('link', { name: 'Enter CardioFamily POC' }).click()
+    await expect(page.getByRole('heading', { level: 1, name: 'Who needs attention now?' })).toBeVisible()
+  })
+})
+
 test('hides the notice at desktop width', async ({ page }) => {
-  await page.goto('/')
-  await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
+  await enterPoc(page)
   await expect(page.getByRole('note', { name: 'Screen size notice' })).toBeHidden()
 })

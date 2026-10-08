@@ -1,10 +1,12 @@
 import AxeBuilder from '@axe-core/playwright'
-import { expect, test } from './fixtures'
+import { enterPoc, expect, test } from './fixtures'
 
 const PIETER_ACTION = '/actions/' + encodeURIComponent('DEMO-R-003:p-janssens-pieter:sp-janssens-pieter')
 
 const PAGES: [string, string][] = [
-  ['Command Centre', '/'],
+  ['Welcome (fresh load)', '/'],
+  ['Welcome', '/welcome'],
+  ['Demo guide', '/guide'],
   ['Families', '/families'],
   ['Janssens workspace', '/families/fam-janssens'],
   ['Peeters workspace', '/families/fam-peeters'],
@@ -32,6 +34,11 @@ for (const [name, path] of PAGES) {
     expect(await scan(page)).toEqual([])
   })
 }
+
+test('axe: Command Centre (entered from Welcome)', async ({ page }) => {
+  await enterPoc(page)
+  expect(await scan(page)).toEqual([])
+})
 
 test('axe: states after recording decisions', async ({ page }) => {
   await page.goto('/reclassifications/rc-peeters-1')

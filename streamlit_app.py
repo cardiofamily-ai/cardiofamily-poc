@@ -11,10 +11,11 @@ from pathlib import Path
 import streamlit as st
 
 APP_HTML = Path(__file__).parent / "streamlit_dist" / "cardiofamily.html"
+APP_ICON = Path(__file__).parent / "public" / "cardiofamily-icon.png"
 
 st.set_page_config(
-    page_title="CardioFamily POC · Demonstration",
-    page_icon="❤️",
+    page_title="CardioFamily · HCM Family Care POC",
+    page_icon=str(APP_ICON),
     layout="wide",
     initial_sidebar_state="collapsed",
     menu_items={"Get help": None, "Report a bug": None, "About": None},

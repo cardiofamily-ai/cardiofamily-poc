@@ -10,6 +10,8 @@ const STREAMLIT_HOST_MESSAGES = [
   /^An iframe which has both allow-scripts and allow-same-origin for its sandbox attribute can escape its sandboxing\.$/,
 ]
 
+const WELCOME_HEADING = 'One cardiac genetic diagnosis should trigger appropriate care for the whole family.'
+
 const test = base.extend<{ app: FrameLocator }>({
   app: async ({ page }, provide) => {
     const problems: string[] = []
@@ -25,7 +27,10 @@ const test = base.extend<{ app: FrameLocator }>({
     })
     await page.goto('/')
     const app = page.frameLocator('iframe[title="st.iframe"]')
-    await expect(app.getByRole('heading', { level: 1, name: 'Who needs attention now?' })).toBeVisible({ timeout: 30_000 })
+    // A fresh session starts on the Welcome page; enter the POC as a first-time visitor would.
+    await expect(app.getByRole('heading', { level: 1, name: WELCOME_HEADING })).toBeVisible({ timeout: 30_000 })
+    await app.getByRole('link', { name: 'Enter CardioFamily POC' }).click()
+    await expect(app.getByRole('heading', { level: 1, name: 'Who needs attention now?' })).toBeVisible()
     await provide(app)
     expect(problems, 'CardioFamily console errors/warnings').toEqual([])
     expect(frameRequests, 'network requests made by CardioFamily').toEqual([])
@@ -51,6 +56,33 @@ test('CardioFamily fills the Streamlit page with no Streamlit chrome', async ({ 
   )
   await expect(app.getByText('CardioFamily is a working prototype name.', { exact: false })).toBeVisible()
   await expect(page.getByText('Synthetic Data · Demonstration Environment')).toHaveCount(0) // not duplicated by the wrapper
+})
+
+test('browser tab carries the CardioFamily title and local icon', async ({ page, app }) => {
+  await expect(page).toHaveTitle('CardioFamily · HCM Family Care POC')
+  const icon = page.locator('link[rel~="icon"]').first()
+  const href = await icon.getAttribute('href')
+  expect(href).toBeTruthy()
+  expect(new URL(href!, page.url()).origin).toBe(new URL(page.url()).origin) // served by the app, not an external URL
+  const res = await page.request.get(new URL(href!, page.url()).href)
+  expect(res.ok()).toBe(true)
+  expect(res.headers()['content-type']).toContain('image/png')
+  await expect(app.getByRole('complementary').getByTestId('brand-mark')).toContainText('CardioFamilyHCM Family Care POC')
+})
+
+test('demo guide and About this POC are reachable in the embedded app; reset stays put', async ({ app }) => {
+  const help = app.getByRole('navigation', { name: 'About the demo' })
+  await help.getByRole('link', { name: 'Demo guide' }).click()
+  await expect(app.getByRole('heading', { level: 1, name: 'Presenting the CardioFamily POC' })).toBeVisible()
+  await app.getByRole('navigation', { name: 'Guide sections' }).getByRole('button', { name: /Reclassification Impact/ }).click()
+  await expect(app.getByRole('heading', { level: 2, name: /Reclassification Impact/ })).toBeFocused()
+  await app.getByRole('link', { name: 'reclassification awaiting impact review' }).click()
+  await app.getByRole('region', { name: 'Clinician review' }).getByRole('radio', { name: /^Reviewed/ }).check()
+  await app.getByRole('button', { name: 'Record decision' }).click()
+  await resetDemo(app)
+  await expect(app.getByRole('heading', { level: 1, name: 'Reclassification impact' })).toBeVisible()
+  await help.getByRole('link', { name: 'About this POC' }).click()
+  await expect(app.getByRole('heading', { level: 1, name: WELCOME_HEADING })).toBeVisible()
 })
 
 test('Story A — family action workflow, record link, history, reset', async ({ app }) => {
@@ -120,7 +152,7 @@ test('keyboard operation inside the embedded app', async ({ page, app }) => {
   // Start sequential focus navigation inside CardioFamily, then Tab to Pieter's overdue row.
   await app.getByRole('heading', { level: 1 }).click()
   let reached = false
-  for (let i = 0; i < 45 && !reached; i++) {
+  for (let i = 0; i < 50 && !reached; i++) {
     await page.keyboard.press('Tab')
     reached = await frame.evaluate(() => {
       const t = document.activeElement?.textContent ?? ''

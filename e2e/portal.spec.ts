@@ -1,7 +1,7 @@
-import { expect, test } from './fixtures'
+import { enterPoc, expect, test } from './fixtures'
 
 test('Relative Portal preview shows only the relative’s own information', async ({ page }) => {
-  await page.goto('/')
+  await enterPoc(page)
   await page.getByRole('link', { name: 'Relative Portal preview' }).click()
   const portal = page.getByRole('region', { name: 'Portal preview for Pieter Janssens' })
   await expect(portal).toContainText('Hello, Pieter')

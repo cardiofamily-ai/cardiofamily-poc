@@ -1,27 +1,24 @@
-import { HeartPulse, RotateCcw } from 'lucide-react'
+import { BookOpen, Info, RotateCcw } from 'lucide-react'
 import { useState } from 'react'
 import { NavLink } from 'react-router'
+import { BrandMark } from '@/components/brand/BrandMark'
 import { PROTOTYPE_NAME_NOTICE } from '@/domain/safety'
 import { formatDisplayDate } from '@/lib/format'
 import { cn } from '@/lib/utils'
 import { useClock } from '@/state/clock-context'
 import { useDemoSession } from '@/state/session-context'
+import { GUIDE_PATH, WELCOME_PATH } from './entry'
 import { NAV_ITEMS } from './navigation'
+
+const HELP_LINK =
+  'flex items-center gap-2 rounded-md px-2.5 py-1.5 text-xs text-muted-foreground hover:bg-sidebar-accent/60 hover:text-sidebar-foreground focus-visible:ring-2 focus-visible:ring-sidebar-ring focus-visible:outline-none'
 
 export function SideNav() {
   const clock = useClock()
 
   return (
     <aside className="flex w-60 shrink-0 flex-col border-r border-sidebar-border bg-sidebar text-sidebar-foreground">
-      <div className="flex items-center gap-2.5 px-5 py-5">
-        <span className="flex size-8 items-center justify-center rounded-md bg-sidebar-primary text-sidebar-primary-foreground">
-          <HeartPulse aria-hidden className="size-4" />
-        </span>
-        <div className="leading-tight">
-          <div className="text-sm font-semibold">CardioFamily</div>
-          <div className="text-xs text-muted-foreground">HCM · Family care</div>
-        </div>
-      </div>
+      <BrandMark className="px-5 py-5" />
 
       <nav aria-label="Primary" className="flex-1 px-3">
         <ul className="space-y-0.5">
@@ -45,6 +42,23 @@ export function SideNav() {
               </NavLink>
             </li>
           ))}
+        </ul>
+      </nav>
+
+      <nav aria-label="About the demo" className="px-3 pb-3">
+        <ul className="space-y-0.5">
+          <li>
+            <NavLink to={GUIDE_PATH} className={({ isActive }) => cn(HELP_LINK, isActive && 'font-medium text-sidebar-foreground')}>
+              <BookOpen aria-hidden className="size-3.5" />
+              Demo guide
+            </NavLink>
+          </li>
+          <li>
+            <NavLink to={WELCOME_PATH} className={HELP_LINK}>
+              <Info aria-hidden className="size-3.5" />
+              About this POC
+            </NavLink>
+          </li>
         </ul>
       </nav>
 

@@ -1,7 +1,7 @@
-import { expect, nav, resetDemo, test } from './fixtures'
+import { enterPoc, expect, nav, resetDemo, test } from './fixtures'
 
 test('Story B — reclassification impact reviewed by the clinician', async ({ page }) => {
-  await page.goto('/')
+  await enterPoc(page)
   const queue = page.getByRole('region', { name: /Variant reclassification — awaiting impact review/ })
   await expect(queue).toContainText('5 people may need clinician review')
   await queue.getByRole('link').click()
